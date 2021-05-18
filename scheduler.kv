@@ -1,0 +1,66 @@
+WindowManager:
+    LoginPage:
+    CalendarPage:
+
+<LoginPage>
+    name: "loginPage"
+    MDBoxLayout:
+        md_bg_color: 231/255, 111/255, 81/255, 1
+        size: root.width, root.height
+        orientation: "vertical"
+        padding: 90
+
+        MDCard:
+            size_hint: None, None
+            size: 300, 450
+            pos_hint:{"center_x": 0.5, "center_y": 0.5}
+            orientation: "vertical"
+            md_bg_color: 42/255, 157/255, 143/255, 1
+            padding: 25
+            spacing: 25
+
+
+            MDLabel:
+                text: "SPSD Schedular"
+                theme_text_color: "Custom"
+                text_color: 38/255, 70/255, 83/255, 1
+                font_size: 40
+                halign: 'center'
+                size_hint_y: None
+                padding_y: 15
+
+
+            MDTextField:
+                hint_text: "Username"
+                icon_right: "account"
+                size_hint_x: None
+                width: 200
+                font_size: 18
+                pos_hint: {"center_x": 0.5}
+
+            MDTextField:
+                hint_text: "Password"
+                icon_right: "eye-off"
+                size_hint_x: None
+                width: 200
+                font_size: 18
+                pos_hint: {"center_x": 0.5}
+                password: True
+
+            MDRoundFlatButton:
+                text: "Log In"
+                font_size: 12
+                pos_hint: {"center_x": 0.5}
+                on_release: app.root.current = "calendarPage"
+
+            MDRoundFlatButton:
+                text: "Clear"
+                font_size: 12
+                pos_hint: {"center_x": 0.5}
+
+<CalendarPage>
+    name: "calendarPage"
+    MDRaisedButton:
+        text: "Open time picker"
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        on_release: app.show_date_picker()
