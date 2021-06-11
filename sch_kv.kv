@@ -1,0 +1,293 @@
+ScreenManager:
+    LoginPage:
+    SignUpPage:
+    SignUpPage2:
+    SignUpPage3:
+    Home:
+    CalendarPage:
+
+
+<LoginPage>
+    name: "LoginPage"
+    MDBoxLayout:
+        size_hint: None, None
+        size: 400, 500
+        pos_hint:{"center_x": 0.5, "center_y": 0.5}
+        orientation: "vertical"
+        padding: 25
+        spacing:25
+
+        MDLabel:
+            text: "SPSD Scheduler"
+            theme_text_color: "Custom"
+            text_color: 0, 0, 0, 0.75
+            font_size: 40
+            halign: 'center'
+            size_hint_y: None
+
+        MDLabel:
+            id: error_text
+            text: ""
+            theme_text_color: "Custom"
+            text_color: 1, 0, 0, 0.75
+            font_size: 10
+            halign: 'center'
+            size_hint_y: None
+            height: '0dp'
+
+        MDTextField:
+            id: user_name
+            hint_text: "Username"
+            icon_right: "account"
+            size_hint_x: None
+            width: 200
+            font_size: 18
+            pos_hint: {"center_x": 0.5}
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
+            required: True
+
+        MDTextField:
+            id: user_pass
+            hint_text: "Password"
+            icon_right: "key-variant"
+            size_hint_x: None
+            width: 200
+            font_size: 18
+            pos_hint: {"center_x": 0.5}
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
+            required: True
+            password: True
+
+
+        MDRectangleFlatButton:
+            id: login_button
+            text: "Log In"
+            font_size: 15
+            pos_hint: {"center_x": 0.5}
+            on_release: app.check_login_username()
+
+        MDSeparator:
+            height: "1dp"
+
+        MDLabel:
+            text: "If you don't have an account"
+            font_size: 12
+            halign: 'center'
+
+
+        MDTextButton:
+            text: "SignUp"
+            font_size: 12
+            pos_hint: {"center_x": 0.5}
+            on_release: root.manager.current = "SignUpPage"
+
+
+<SignUpPage>
+    name: "SignUpPage"
+
+
+    MDBoxLayout:
+        size_hint: None, None
+        size: 400, 500
+        pos_hint:{"center_x": 0.5, "center_y": 0.5}
+        orientation: "vertical"
+        padding: 45
+        spacing:15
+
+        MDLabel:
+            text: "Sign Up"
+            theme_text_color: "Custom"
+            text_color: 0, 0, 0, 0.75
+            font_size: 25
+            halign: 'center'
+            size_hint_y: None
+
+        MDSeparator:
+            height: "1dp"
+
+        MDTextField:
+            id: use
+            hint_text: "Username"
+            icon_right: "account"
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+
+        MDTextField:
+            hint_text: "Email"
+            icon_right: "account"
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+
+        MDTextField:
+            hint_text: "Password"
+            icon_right: "eye-off"
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+            password: True
+
+        MDTextField:
+            hint_text: "Confirm Password"
+            icon_right: "eye-off"
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+            password: True
+
+
+        MDRectangleFlatButton:
+            text: "SignUp"
+            font_size: 15
+            pos_hint: {"center_x": 0.5}
+            on_release: app.check_login_username()
+
+
+    MDProgressBar:
+        value: 30
+        pos_hint: {'center_y': 0.01}
+
+<SignUpPage2>
+    name: "SignUpPage2"
+    MDBoxLayout:
+        size_hint: None, None
+        size: 400, 500
+        pos_hint:{"center_x": 0.5, "center_y": 0.5}
+        orientation: "vertical"
+        padding: 45
+        spacing:15
+
+
+        MDLabel:
+            text: "Fill in the form to get started"
+        MDTextField:
+            hint_text: "Program"
+
+        MDTextField:
+            hint_text: "Current CGPA"
+
+        BoxLayout:
+
+            MDFlatButton:
+                text: "CANCEL"
+                text_color: self.theme_cls.primary_color
+                on_release:
+                    root.manager.current = "SignUpPage"
+                    root.manager.transition.direction = "right"
+
+            MDFlatButton:
+                text: "OK"
+                text_color: self.theme_cls.primary_color
+                on_release: root.manager.current = "SignUpPage3"
+
+    MDProgressBar:
+        value: 60
+        pos_hint: {'center_y': 0.01}
+
+<SignUpPage3>
+    name: "SignUpPage3"
+    MDBoxLayout:
+        size_hint: None, None
+        size: 400, 500
+        pos_hint:{"center_x": 0.5, "center_y": 0.5}
+        orientation: "vertical"
+        padding: 45
+        spacing:15
+
+
+        MDLabel:
+            text: "Add in some more details"
+
+        MDTextField:
+            hint_text: "I dont know"
+
+        MDTextField:
+            hint_text: "Current CGPA"
+
+        BoxLayout:
+
+            MDFlatButton:
+                text: "CANCEL"
+                text_color: self.theme_cls.primary_color
+                on_release:
+                    root.manager.current = "SignUpPage"
+                    root.manager.transition.direction = "right"
+
+            MDFlatButton:
+                text: "OK"
+                text_color: self.theme_cls.primary_color
+                on_release: root.manager.current = "CalendarPage"
+
+    MDProgressBar:
+        value: 100
+        pos_hint: {'center_y': 0.01}
+
+
+<Home>
+    name: "Home"
+    NavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        title: 'Tasks'
+                        elevation:10
+                        left_action_items: [['menu', lambda x : nav_drawer.toggle_nav_drawer()]]
+                    Widget:
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: '8dp'
+                padding: '8dp'
+
+
+                MDLabel:
+                    text: 'SPSD Task Scheduler'
+                    font_style: 'H5'
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                ScrollView:
+                    MDList:
+                        OneLineIconListItem:
+                            text: 'Calender'
+                            IconLeftWidget:
+                                icon: 'calendar'
+
+                        OneLineIconListItem:
+                            text: 'Profile'
+                            IconLeftWidget:
+                                icon: 'profile-settings'
+
+                        OneLineIconListItem:
+                            text: 'Settings'
+                            IconLeftWidget:
+                                icon: 'settings-outline'
+
+                        OneLineIconListItem:
+                            text: 'CGPA Calculator'
+                            IconLeftWidget:
+                                icon: 'calculator'
+
+
+
+
+
+<CalendarPage>
+    name: "CalendarPage"
+    MDRaisedButton:
+        text: "Open time picker"
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        on_release: app.calendarPicker()
+
+
+
+
+
+
