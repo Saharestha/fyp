@@ -1,11 +1,13 @@
+
 ScreenManager:
     LoginPage:
     SignUpPage:
     SignUpPage2:
     SignUpPage3:
     Home:
+    SettingsPage:
     CalendarPage:
-
+    ProfilePage:
 
 <LoginPage>
     name: "LoginPage"
@@ -30,7 +32,7 @@ ScreenManager:
             text: ""
             theme_text_color: "Custom"
             text_color: 1, 0, 0, 0.75
-            font_size: 10
+            font_size: 15
             halign: 'center'
             size_hint_y: None
             height: '0dp'
@@ -87,7 +89,6 @@ ScreenManager:
 <SignUpPage>
     name: "SignUpPage"
 
-
     MDBoxLayout:
         size_hint: None, None
         size: 400, 500
@@ -104,51 +105,80 @@ ScreenManager:
             halign: 'center'
             size_hint_y: None
 
+        MDLabel:
+            id: error_text_signup
+            text: ""
+            theme_text_color: "Custom"
+            text_color: 1, 0, 0, 0.75
+            font_size: 13
+            halign: 'center'
+            size_hint_y: None
+            height: '0dp'
+
         MDSeparator:
             height: "1dp"
 
         MDTextField:
-            id: use
+            id: sign_username
             hint_text: "Username"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
             icon_right: "account"
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
+            required: True
 
         MDTextField:
+            id: sign_useremail
             hint_text: "Email"
             icon_right: "account"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
+            required: True
 
         MDTextField:
+            id: sign_userpass
             hint_text: "Password"
-            icon_right: "eye-off"
+            icon_right: "key-variant"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
             password: True
+            required: True
 
         MDTextField:
+            id: sign_con_userpass
             hint_text: "Confirm Password"
-            icon_right: "eye-off"
+            icon_right: "key-variant"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
             password: True
-
-
+            required: True
         MDRectangleFlatButton:
             text: "SignUp"
             font_size: 15
             pos_hint: {"center_x": 0.5}
-            on_release: app.check_login_username()
+            on_release: app.check_signup_page()
 
+        MDFlatButton:
+            text: "Already have an account?"
+            font_size: 10
+            pos_hint: {"center_x": 0.5}
+            on_release: root.manager.current = "LoginPage"
 
     MDProgressBar:
         value: 30
         pos_hint: {'center_y': 0.01}
+
 
 <SignUpPage2>
     name: "SignUpPage2"
@@ -163,16 +193,39 @@ ScreenManager:
 
         MDLabel:
             text: "Fill in the form to get started"
+
+        MDLabel:
+            id: pass_id
+            text: ""
+            height: '0dp'
         MDTextField:
+            id: stu_prog
             hint_text: "Program"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
 
         MDTextField:
+            id: stu_cgpa
             hint_text: "Current CGPA"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
+
+        MDTextField:
+            id: stu_sem
+            hint_text: "Current Semester"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
+
+        MDTextField:
+            id: stu_subs
+            hint_text: "No. of subjects this sem"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
 
         BoxLayout:
 
             MDFlatButton:
-                text: "CANCEL"
+                text: "Go Back"
                 text_color: self.theme_cls.primary_color
                 on_release:
                     root.manager.current = "SignUpPage"
@@ -181,11 +234,49 @@ ScreenManager:
             MDFlatButton:
                 text: "OK"
                 text_color: self.theme_cls.primary_color
-                on_release: root.manager.current = "SignUpPage3"
+                on_release: app.check_signup2()
 
     MDProgressBar:
         value: 60
         pos_hint: {'center_y': 0.01}
+
+
+<Content>
+    orientation: "vertical"
+    spacing: "20dp"
+    size_hint_y: None
+    height: "250dp"
+    course_code: course_code
+    course_name: course_name
+    course_credit: course_credit
+
+    MDTextField:
+        id: course_code
+        hint_text: "Course Code"
+        helper_text: "Required"
+        helper_text_mode: 'on_error'
+
+    MDTextField:
+        id: course_name
+        hint_text: "Course Name"
+        helper_text: "Required"
+        helper_text_mode: 'on_error'
+
+    MDTextField:
+        id: course_credit
+        hint_text: "Credit_hours"
+        helper_text: "Required"
+        helper_text_mode: 'on_error'
+
+    BoxLayout:
+        MDFlatButton:
+            text: "Add_next"
+            on_release: root.course_details(self)
+
+        MDFlatButton:
+            text: "Done"
+            on_release: app.close_dialog()
+
 
 <SignUpPage3>
     name: "SignUpPage3"
@@ -197,20 +288,19 @@ ScreenManager:
         padding: 45
         spacing:15
 
-
         MDLabel:
-            text: "Add in some more details"
+            text: "Enter your subjects"
 
-        MDTextField:
-            hint_text: "I dont know"
+        MDRectangleFlatButton:
+            text: "Add Subjects"
+            on_release: app.add_subject_dialog()
 
-        MDTextField:
-            hint_text: "Current CGPA"
+
 
         BoxLayout:
 
             MDFlatButton:
-                text: "CANCEL"
+                text: "Go Back"
                 text_color: self.theme_cls.primary_color
                 on_release:
                     root.manager.current = "SignUpPage"
@@ -219,7 +309,7 @@ ScreenManager:
             MDFlatButton:
                 text: "OK"
                 text_color: self.theme_cls.primary_color
-                on_release: root.manager.current = "CalendarPage"
+                on_release: root.manager.current = "Home"
 
     MDProgressBar:
         value: 100
@@ -236,14 +326,15 @@ ScreenManager:
                     MDToolbar:
                         title: 'Tasks'
                         elevation:10
-                        left_action_items: [['menu', lambda x : nav_drawer.toggle_nav_drawer()]]
+                        left_action_items: [['menu', lambda x : nav_drawer.set_state("open")]]
                     Widget:
+
 
         MDNavigationDrawer:
             id: nav_drawer
             BoxLayout:
                 orientation: 'vertical'
-                spacing: '8dp'
+                spacing: '100dp'
                 padding: '8dp'
 
 
@@ -256,17 +347,23 @@ ScreenManager:
                 ScrollView:
                     MDList:
                         OneLineIconListItem:
+                            id: cal_page
                             text: 'Calender'
+                            on_release:
+                                app.calendarPage_title()
+
                             IconLeftWidget:
                                 icon: 'calendar'
 
                         OneLineIconListItem:
                             text: 'Profile'
+                            on_release: root.manager.current = "ProfilePage"
                             IconLeftWidget:
-                                icon: 'profile-settings'
+                                icon: 'account-settings'
 
                         OneLineIconListItem:
                             text: 'Settings'
+                            on_release: root.manager.current = "SettingsPage"
                             IconLeftWidget:
                                 icon: 'settings-outline'
 
@@ -275,19 +372,231 @@ ScreenManager:
                             IconLeftWidget:
                                 icon: 'calculator'
 
+    MDLabel:
+        text: "hello"
 
+<ProfilePage>
+    name: "ProfilePage"
+    NavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 20
+                    MDToolbar:
+                        title: 'Profile Settings'
+                        elevation:10
+                        left_action_items: [['close', lambda x : app.close_page()]]
+                    Widget:
+
+                    MDCard:
+                        size_hint: (.9, None)
+                        height: dp(120)
+                        pos_hint: {'center_x': 0.5}
+                        BoxLayout:
+                            orientation:'vertical'
+                            padding: dp(8)
+                            BoxLayout:
+                                MDLabel:
+                                    text: 'Change UserName'
+                                    size_hint_y: None
+                                    font_style: "H6"
+                                    font_size: '15'
+                                    height: dp(36)
+                                MDIconButton:
+                                    icon: 'android'
+
+
+                            MDSeparator:
+                                height: dp(1)
+                            MDLabel:
+                                text: 'Body'
+                                font_style: "Body2"
+                    MDCard:
+                        size_hint: (.9, None)
+                        height: dp(120)
+                        pos_hint: {'center_x': 0.5}
+                        BoxLayout:
+                            orientation:'vertical'
+                            padding: dp(8)
+                            BoxLayout:
+                                MDLabel:
+                                    text: 'Change Email'
+                                    size_hint_y: None
+                                    font_style: "H6"
+                                    font_size: '15'
+                                    height: dp(36)
+                                MDIconButton:
+                                    icon: 'android'
+                            MDSeparator:
+                                height: dp(1)
+                            MDLabel:
+                                text: 'Body'
+                                font_style: "Body2"
+                    MDCard:
+                        size_hint: (.9, None)
+                        height: dp(120)
+                        pos_hint: {'center_x': 0.5}
+                        BoxLayout:
+                            orientation:'vertical'
+                            padding: dp(8)
+                            BoxLayout:
+                                MDLabel:
+                                    text: 'Change Password'
+                                    size_hint_y: None
+                                    font_style: "H6"
+                                    font_size: '15'
+                                    height: dp(36)
+                                MDIconButton:
+                                    icon: 'android'
+                            MDSeparator:
+                                height: dp(1)
+                            MDLabel:
+                                text: 'Body'
+                                font_style: "Body2"
+
+                    Widget:
+
+
+
+<Dates>
 
 
 
 <CalendarPage>
     name: "CalendarPage"
-    MDRaisedButton:
-        text: "Open time picker"
-        pos_hint: {'center_x': .5, 'center_y': .5}
-        on_release: app.calendarPicker()
+
+    NavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        id: cal_tool
+                        title: ""
+                        elevation:10
+                        left_action_items: [['close', lambda x : app.close_page()]]
+                    Widget:
+                        size_hint: (None, None)
+                        height: 0
+
+                    GridLayout:
+                        size_hint_y: None
+                        height: 100
+                        cols: 7
+                        pos_hint : {'center_y': .7}
+                        MDLabel:
+                            text: "Mon"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Tue"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Thurs"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Wed"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Fri"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Sat"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Sun"
+                            halign: 'center'
+
+                    Dates:
 
 
 
 
+                    Widget:
+                    MDBottomAppBar:
+
+                        MDToolbar:
+                            title: ""
+                            icon: "calendar-search"
+                            type: "bottom"
+                            on_action_button: app.show_example_custom_bottom_sheet()
+
+
+<ContentCustomSheet>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: 250
+    bottom_date: bottom_date
+    prev_b: prev_b
+    next_b:next_b
+
+    MDBoxLayout:
+        adaptive_height: True
+        MDIconButton:
+            id: prev_b
+            icon: 'chevron-left'
+            on_release: root.change_date_prev()
+        MDLabel:
+            id: bottom_date
+            text: root.date_c()
+            halign: "center"
+        MDIconButton:
+            id: next_b
+            icon: 'chevron-right'
+            on_release: root.change_date_next()
+
+
+    GridLayout:
+        cols: 4
+        spacing: 20
+        padding: 30
+        Button:
+            id: Jan
+            text: "Jan"
+            on_press: app.go_back(self)
+        Button:
+            id:Feb
+            text: "Feb"
+            on_press: app.go_back(self)
+        Button:
+            id:Mar
+            text: "Mar"
+            on_press: app.go_back(self)
+        Button:
+            id:Apr
+            text: "Apr"
+            on_press: app.go_back(self)
+        Button:
+            id:May
+            text: "May"
+            on_press: app.go_back(self)
+        Button:
+            id:June
+            text: "June"
+            on_press: app.go_back(self)
+        Button:
+            id:July
+            text: "July"
+            on_press: app.go_back(self)
+        Button:
+            id:Aug
+            text: "Aug"
+            on_press: app.go_back(self)
+        Button:
+            id:Sept
+            text: "Sept"
+            on_press: app.go_back(self)
+        Button:
+            id:Oct
+            text: "Oct"
+            on_press: app.go_back(self)
+        Button:
+            id: Nov
+            text: "Nov"
+            on_press: app.go_back(self)
+        Button:
+            id: Dec
+            text: "Dec"
+            on_press: app.go_back(self)
 
 
