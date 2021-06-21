@@ -6,6 +6,7 @@ ScreenManager:
     SignUpPage3:
     Home:
     TaskScreen:
+    EventScreen:
     SettingsPage:
     CalendarPage:
     ProfilePage:
@@ -408,12 +409,105 @@ ScreenManager:
             size: self.size
 
     MDCard:
+
+        size_hint: None, None
+        size: root.width - 50, root.height - 50
+        pos_hint:{'center_x': 0.5, 'center_y': 0.5}
+        elevation: 60
+        orientation: 'vertical'
+
+        MDLabel:
+            text: "Add Task"
+            halign: "center"
+
+        MDTextField:
+            id: event_name
+            hint_text: "Task Name"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
+            required: True
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: None
+            width: 200
+
+        MDLabel:
+            text: "Select task type"
+            halign: "center"
+
+        GridLayout:
+            cols: 4
+            size_hint_x: None
+            width: 310
+            pos_hint: {"center_x": 0.5}
+            CheckBox:
+                group: "task_type"
+            MDLabel:
+                text: "Test/Exam"
+                halign: "center"
+            CheckBox:
+                group: "task_type"
+            MDLabel:
+                text: "Assignment"
+                halign: "center"
+
+        DropDown:
+
+        GridLayout:
+            cols: 2
+            size_hint_x: None
+            width: 200
+            pos_hint: {"center_x": 0.5}
+            MDTextField:
+                id: due_date
+                text: ""
+                hint_text: "Select Due Date"
+                helper_text: "Click on calendar icon to select"
+                helper_text_mode: "persistent"
+                required: True
+                pos_hint: {"center_x": 0.5}
+                size_hint_x: None
+                width: 200
+
+            MDIconButton:
+                icon: "calendar-month"
+                ripple_scale: .5
+                pos_hint: {"center_y": .5}
+
+
+
+
+<EventScreen>
+    name: "EventScreen"
+    canvas.before:
+        Color:
+            rgba: (0, 0, 1, 0.5)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDCard:
         spacing: 100
         size_hint: None, None
         size: root.width - 50, root.height - 50
         pos_hint:{'center_x': 0.5, 'center_y': 0.5}
         elevation: 10
         orientation: 'vertical'
+
+        MDLabel:
+            text: "Add Event"
+            halign: "center"
+            padding_y: 10
+
+        MDTextField:
+            id: event_name
+            hint_text: "Event Name"
+            helper_text: "Required"
+            helper_text_mode: 'on_error'
+            required: True
+            pos_hint: {"center_x": 0.5}
+
+
+
 
 
 

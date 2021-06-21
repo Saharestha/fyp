@@ -375,6 +375,9 @@ class Scheduler(MDApp):
     def callback(self, instance):
         if instance.icon == "calendar-check":
             self.strng.get_screen('TaskScreen').manager.current = 'TaskScreen'
+        else:
+            self.strng.get_screen('EventScreen').manager.current = 'EventScreen'
+
 
 
 
