@@ -1,16 +1,15 @@
-
+#:import NoTransition kivy.uix.screenmanager.NoTransition
 ScreenManager:
     LoginPage:
     SignUpPage:
     SignUpPage2:
     SignUpPage3:
     Home:
-    TaskScreen:
-    EventScreen:
-    SettingsPage:
     CalendarPage:
     ProfilePage:
-
+    EventScreen:
+    TaskScreen:
+    Store:
 
 <LoginPage>
     name: "LoginPage"
@@ -41,12 +40,15 @@ ScreenManager:
             height: '0dp'
 
         MDTextField:
-            id: user_name
-            hint_text: "Username"
+            id: user_email
+            hint_text: "Email"
             icon_right: "account"
             size_hint_x: None
             width: 200
             font_size: 18
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             pos_hint: {"center_x": 0.5}
             helper_text: "Required"
             helper_text_mode: 'on_error'
@@ -58,6 +60,9 @@ ScreenManager:
             icon_right: "key-variant"
             size_hint_x: None
             width: 200
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             font_size: 18
             pos_hint: {"center_x": 0.5}
             helper_text: "Required"
@@ -73,7 +78,7 @@ ScreenManager:
             pos_hint: {"center_x": 0.5}
             on_release:
                 app.check_login_username()
-                app.home_view()
+
 
         MDSeparator:
             height: "1dp"
@@ -89,7 +94,6 @@ ScreenManager:
             font_size: 12
             pos_hint: {"center_x": 0.5}
             on_release: root.manager.current = "SignUpPage"
-
 
 <SignUpPage>
     name: "SignUpPage"
@@ -129,6 +133,9 @@ ScreenManager:
             helper_text: "Required"
             helper_text_mode: 'on_error'
             icon_right: "account"
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
@@ -140,6 +147,9 @@ ScreenManager:
             icon_right: "account"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
@@ -151,6 +161,9 @@ ScreenManager:
             icon_right: "key-variant"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
@@ -163,6 +176,9 @@ ScreenManager:
             icon_right: "key-variant"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
             width: 250
             pos_hint: {"center_x": 0.5}
@@ -183,7 +199,6 @@ ScreenManager:
     MDProgressBar:
         value: 30
         pos_hint: {'center_y': 0.01}
-
 
 <SignUpPage2>
     name: "SignUpPage2"
@@ -208,6 +223,9 @@ ScreenManager:
             hint_text: "Program"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             required: True
 
         MDTextField:
@@ -215,6 +233,9 @@ ScreenManager:
             hint_text: "Current CGPA"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             required: True
 
         MDTextField:
@@ -222,14 +243,11 @@ ScreenManager:
             hint_text: "Current Semester"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             required: True
 
-        MDTextField:
-            id: stu_subs
-            hint_text: "No. of subjects this sem"
-            helper_text: "Required"
-            helper_text_mode: 'on_error'
-            required: True
 
         BoxLayout:
 
@@ -249,6 +267,47 @@ ScreenManager:
         value: 60
         pos_hint: {'center_y': 0.01}
 
+<SignUpPage3>
+    name: "SignUpPage3"
+    MDBoxLayout:
+        size_hint: None, None
+        size: 400, 500
+        pos_hint:{"center_x": 0.5, "center_y": 0.5}
+        orientation: "vertical"
+        padding: 45
+        spacing:15
+
+        MDLabel:
+            text: "You have been registered"
+            halign: 'center'
+
+        MDLabel:
+            text: "Enter your subjects"
+
+        MDRectangleFlatButton:
+            text: "Add Subjects"
+            on_release: app.add_subject_dialog()
+
+        BoxLayout:
+            MDFlatButton:
+                text: "Go Back"
+                text_color: self.theme_cls.primary_color
+                on_release:
+                    root.manager.current = "SignUpPage"
+                    root.manager.transition.direction = "right"
+
+            MDFlatButton:
+                text: "OK"
+                text_color: self.theme_cls.primary_color
+                on_release:
+                    root.manager.transition = NoTransition(duration=0)
+                    root.manager.current = "Home"
+                    app.home_view()
+
+
+    MDProgressBar:
+        value: 100
+        pos_hint: {'center_y': 0.01}
 
 <Content>
     orientation: "vertical"
@@ -264,6 +323,9 @@ ScreenManager:
         hint_text: "Course Code"
         helper_text: "Required"
         helper_text_mode: 'on_error'
+        color_mode:'custom'
+        current_hint_text_color: app.theme_cls.accent_color
+        line_color_focus: app.theme_cls.accent_color
         required: True
 
     MDTextField:
@@ -271,6 +333,9 @@ ScreenManager:
         hint_text: "Course Name"
         helper_text: "Required"
         helper_text_mode: 'on_error'
+        color_mode:'custom'
+        current_hint_text_color: app.theme_cls.accent_color
+        line_color_focus: app.theme_cls.accent_color
         required: True
 
     MDTextField:
@@ -278,6 +343,9 @@ ScreenManager:
         hint_text: "Credit_hours"
         helper_text: "Required"
         helper_text_mode: 'on_error'
+        color_mode:'custom'
+        current_hint_text_color: app.theme_cls.accent_color
+        line_color_focus: app.theme_cls.accent_color
         required: True
 
     BoxLayout:
@@ -289,51 +357,9 @@ ScreenManager:
             text: "Done"
             on_release: app.close_dialog()
 
-
-<SignUpPage3>
-    name: "SignUpPage3"
-    MDBoxLayout:
-        size_hint: None, None
-        size: 400, 500
-        pos_hint:{"center_x": 0.5, "center_y": 0.5}
-        orientation: "vertical"
-        padding: 45
-        spacing:15
-
-        MDLabel:
-            text: "Enter your subjects"
-
-        MDRectangleFlatButton:
-            text: "Add Subjects"
-            on_release: app.add_subject_dialog()
-
-
-
-        BoxLayout:
-
-            MDFlatButton:
-                text: "Go Back"
-                text_color: self.theme_cls.primary_color
-                on_release:
-                    root.manager.current = "SignUpPage"
-                    root.manager.transition.direction = "right"
-
-            MDFlatButton:
-                text: "OK"
-                text_color: self.theme_cls.primary_color
-                on_release:
-                    root.manager.current = "Home"
-                    app.home_view()
-
-    MDProgressBar:
-        value: 100
-        pos_hint: {'center_y': 0.01}
-
-
-
 <Home>
     name: "Home"
-    NavigationLayout:
+    MDNavigationLayout:
         ScreenManager:
             Screen:
                 BoxLayout:
@@ -351,10 +377,10 @@ ScreenManager:
                         MDList:
                             id: view_all
 
-                    MDFloatingActionButtonSpeedDial:
-                        data: app.data
-                        root_button_anim: True
-                        callback: app.callback
+                MDFloatingActionButtonSpeedDial:
+                    data: app.data
+                    root_button_anim: True
+                    callback: app.callback
 
         MDNavigationDrawer:
             id: nav_drawer
@@ -389,133 +415,396 @@ ScreenManager:
                                 icon: 'account-settings'
 
                         OneLineIconListItem:
-                            text: 'Settings'
-                            on_release: root.manager.current = "SettingsPage"
-                            IconLeftWidget:
-                                icon: 'settings-outline'
-
-                        OneLineIconListItem:
                             text: 'CGPA Calculator'
                             IconLeftWidget:
                                 icon: 'calculator'
 
+                        OneLineIconListItem:
+                            text: "Logout"
+                            on_release:
+                                app.clear_all()
+                                root.manager.current = "LoginPage"
+                            IconLeftWidget:
+                                icon: 'logout'
+
 <TaskScreen>
     name: "TaskScreen"
-    canvas.before:
-        Color:
-            rgba: (0, 0, 1, 0.5)
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-    MDCard:
-
-        size_hint: None, None
-        size: root.width - 50, root.height - 50
-        pos_hint:{'center_x': 0.5, 'center_y': 0.5}
-        elevation: 60
+    BoxLayout:
         orientation: 'vertical'
-
+        pos_hint: {"center_x": 0.5, "center_y":0.5}
         MDLabel:
             text: "Add Task"
             halign: "center"
 
+
         MDTextField:
-            id: event_name
+            id: task_name
             hint_text: "Task Name"
             helper_text: "Required"
             helper_text_mode: 'on_error'
-            required: True
-            pos_hint: {"center_x": 0.5}
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 200
-
-        MDLabel:
-            text: "Select task type"
-            halign: "center"
+            width: 210
+            required: True
+            font_size: 25
+            pos_hint: {"center_x": 0.5}
 
         GridLayout:
-            cols: 4
+            cols:2
             size_hint_x: None
-            width: 310
+            width: 350
             pos_hint: {"center_x": 0.5}
-            CheckBox:
-                group: "task_type"
             MDLabel:
-                text: "Test/Exam"
+                text: "Select task type:"
                 halign: "center"
-            CheckBox:
-                group: "task_type"
-            MDLabel:
-                text: "Assignment"
-                halign: "center"
+            GridLayout:
+                cols: 2
+                size_hint_x: None
+                width: 200
+                pos_hint: {"center_x": 0.5}
+                MDCheckbox:
+                    id: exam
+                    text: "Exam"
+                    group: "task_type"
+                MDLabel:
+                    text: "Test/Exam"
+                    halign: "center"
+                MDCheckbox:
+                    id: assign
+                    text: "Assignment"
+                    group: "task_type"
+                MDLabel:
+                    text: "Assignment"
+                    halign: "center"
 
-        DropDown:
+        MDSeparator:
+            height: "1dp"
 
         GridLayout:
             cols: 2
+            size_hint_y: None
+            height: 50
             size_hint_x: None
-            width: 200
+            width: 400
             pos_hint: {"center_x": 0.5}
+            padding: [10,10]
+            MDLabel:
+                text: "Select Subject"
+                halign: "center"
             MDTextField:
-                id: due_date
+                id: task_sub
                 text: ""
-                hint_text: "Select Due Date"
-                helper_text: "Click on calendar icon to select"
-                helper_text_mode: "persistent"
+                hint_text: "Select Subject:"
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                pos_hint: {"center_x": 0.5}
+                size_hint_x: None
+                width: 190
+                on_focus: app.drop_subs()
+
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+            height: 50
+            size_hint_x: None
+            width: 400
+            pos_hint: {"center_x": 0.5}
+            padding: [10,20]
+            MDLabel:
+                text: "Marks percentage:"
+                halign: "center"
+            MDTextField:
+                id: percent
+                text: ""
+                hint_text: "Enter here"
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
                 required: True
                 pos_hint: {"center_x": 0.5}
                 size_hint_x: None
-                width: 200
+                width: 190
+
+        GridLayout:
+            cols: 2
+            size_hint: None, None
+            width: 210
+            pos_hint: {"center_x": 0.5}
+            padding: [10,50]
+            MDTextField:
+                id: due_date
+                text: ""
+                hint_text: "Select date"
+                helper_text: "Click on calendar icon to select"
+                helper_text_mode: "persistent"
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                pos_hint: {"center_x": 0.5}
+                size_hint_x: None
+                width: 190
 
             MDIconButton:
                 icon: "calendar-month"
                 ripple_scale: .5
                 pos_hint: {"center_y": .5}
+                on_release: app.date_picker(self)
 
+
+        GridLayout:
+            cols: 2
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+            padding: [0, 20]
+            spacing: [30, 0]
+            MDFlatButton:
+                text: "Cancel"
+                on_release: root.manager.current = "Home"
+            MDFlatButton:
+                text: "Add Task"
+                on_release:
+                    app.add_task()
 
 
 
 <EventScreen>
     name: "EventScreen"
-    canvas.before:
-        Color:
-            rgba: (0, 0, 1, 0.5)
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-    MDCard:
-        spacing: 100
-        size_hint: None, None
-        size: root.width - 50, root.height - 50
-        pos_hint:{'center_x': 0.5, 'center_y': 0.5}
-        elevation: 10
-        orientation: 'vertical'
-
+    BoxLayout:
+        orientation: "vertical"
+        pos_hint: {"center_x": 0.5, "center_y":0.5}
         MDLabel:
             text: "Add Event"
             halign: "center"
-            padding_y: 10
 
         MDTextField:
             id: event_name
             hint_text: "Event Name"
             helper_text: "Required"
             helper_text_mode: 'on_error'
+            color_mode:'custom'
+            current_hint_text_color: app.theme_cls.accent_color
+            line_color_focus: app.theme_cls.accent_color
+            size_hint_x: None
+            width: 210
             required: True
+            font_size: 25
             pos_hint: {"center_x": 0.5}
 
+        GridLayout:
+            cols: 2
+            size_hint: None, None
+            width: 210
+            pos_hint: {"center_x": 0.5}
+
+            padding: [0, 15]
+            MDTextField:
+                id: eve_date
+                text: ""
+                hint_text: "Select date"
+                helper_text: "Click on calendar icon to select"
+                helper_text_mode: "persistent"
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                pos_hint: {"center_x": 0.5}
+                size_hint_x: None
+                width: 190
+
+            MDIconButton:
+                icon: "calendar-cursor"
+                ripple_scale: .5
+                pos_hint: {"center_y": .5}
+                on_release: app.date_picker(self)
+
+        GridLayout:
+            cols: 2
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+            spacing: [30, 0]
+            MDTextField:
+                id: eve_time_start
+                text: ""
+                hint_text: "From"
+                pos_hint: {"center_x": 0.5}
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                on_focus: app.timePicker_start()
 
 
+            MDTextField:
+                id: eve_time_end
+                text: ""
+                hint_text: "To"
+                pos_hint: {"center_x": 0.5}
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                on_focus: app.timePicker_end()
 
+        GridLayout:
+            cols: 2
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+            spacing: [30, 0]
+            MDFlatButton:
+                text: "Cancel"
+                on_release:
+                    root.manager.transition = NoTransition()
+                    root.manager.current = "Home"
+            MDFlatButton:
+                text: "Add Task"
+                on_release:
+                    app.add_event()
 
+<CalendarPage>
+    name: "CalendarPage"
 
+    MDNavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        id: cal_tool
+                        title: ""
+                        elevation:10
+                        left_action_items: [['close', lambda x : app.close_page()]]
+                    Widget:
+                        size_hint: (None, None)
+                        height: 0
 
+                    GridLayout:
+                        size_hint_y: None
+                        height: 100
+                        cols: 7
+                        pos_hint : {'center_y': .7}
+                        MDLabel:
+                            text: "Mon"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Tue"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Thurs"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Wed"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Fri"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Sat"
+                            halign: 'center'
+                        MDLabel:
+                            text: "Sun"
+                            halign: 'center'
+
+                    GridLayout:
+                        cols:7
+                        id: calendar_space
+
+                    MDLabel:
+                        id: id_store
+                        text:""
+                        font_size: 0
+
+                    Widget:
+                    MDBottomAppBar:
+
+                        MDToolbar:
+                            title: ""
+                            icon: "calendar-search"
+                            type: "bottom"
+                            on_action_button: app.select_calendar()
+
+<ContentCustomSheet>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: 250
+    bottom_date: bottom_date
+    prev_b: prev_b
+    next_b:next_b
+
+    MDBoxLayout:
+        adaptive_height: True
+        MDIconButton:
+            id: prev_b
+            icon: 'chevron-left'
+            on_release: root.change_date_prev()
+        MDLabel:
+            id: bottom_date
+            text: root.date_c()
+            halign: "center"
+        MDIconButton:
+            id: next_b
+            icon: 'chevron-right'
+            on_release: root.change_date_next()
+    GridLayout:
+        cols: 4
+        spacing: 20
+        spacing: 20
+        padding: 30
+        Button:
+            id: Jan
+            text: "Jan"
+            on_press: app.go_back(self)
+        Button:
+            id:Feb
+            text: "Feb"
+            on_press: app.go_back(self)
+        Button:
+            id:Mar
+            text: "Mar"
+            on_press: app.go_back(self)
+
+        Button:
+            id:Apr
+            text: "Apr"
+            on_press: app.go_back(self)
+        Button:
+            id:May
+            text: "May"
+            on_press: app.go_back(self)
+        Button:
+            id:June
+            text: "June"
+            on_press: app.go_back(self)
+        Button:
+            id:July
+            text: "July"
+            on_press: app.go_back(self)
+        Button:
+            id:Aug
+            text: "Aug"
+            on_press: app.go_back(self)
+        Button:
+            id:Sept
+            text: "Sept"
+            on_press: app.go_back(self)
+        Button:
+            id:Oct
+            text: "Oct"
+            on_press: app.go_back(self)
+        Button:
+            id: Nov
+            text: "Nov"
+            on_press: app.go_back(self)
+        Button:
+            id: Dec
+            text: "Dec"
+            on_press: app.go_back(self)
 
 <ProfilePage>
     name: "ProfilePage"
-    NavigationLayout:
+    MDNavigationLayout:
         ScreenManager:
             Screen:
                 BoxLayout:
@@ -596,152 +885,12 @@ ScreenManager:
                     Widget:
 
 
-<see_events>
+<Store>
+    name: "Store"
+    MDLabel:
+        id: user_id
+        text: ""
 
-
-
-
-
-
-<CalendarPage>
-    name: "CalendarPage"
-
-    NavigationLayout:
-        ScreenManager:
-            Screen:
-                BoxLayout:
-                    orientation: 'vertical'
-                    MDToolbar:
-                        id: cal_tool
-                        title: ""
-                        elevation:10
-                        left_action_items: [['close', lambda x : app.close_page()]]
-                    Widget:
-                        size_hint: (None, None)
-                        height: 0
-
-                    GridLayout:
-                        size_hint_y: None
-                        height: 100
-                        cols: 7
-                        pos_hint : {'center_y': .7}
-                        MDLabel:
-                            text: "Mon"
-                            halign: 'center'
-                        MDLabel:
-                            text: "Tue"
-                            halign: 'center'
-                        MDLabel:
-                            text: "Thurs"
-                            halign: 'center'
-                        MDLabel:
-                            text: "Wed"
-                            halign: 'center'
-                        MDLabel:
-                            text: "Fri"
-                            halign: 'center'
-                        MDLabel:
-                            text: "Sat"
-                            halign: 'center'
-                        MDLabel:
-                            text: "Sun"
-                            halign: 'center'
-
-                    GridLayout:
-                        cols:7
-                        id: calendar_space
-
-                    MDLabel:
-                        id: id_store
-                        text:""
-                        font_size: 0
-
-                    Widget:
-                    MDBottomAppBar:
-
-                        MDToolbar:
-                            title: ""
-                            icon: "calendar-search"
-                            type: "bottom"
-                            on_action_button: app.show_example_custom_bottom_sheet()
-
-
-<ContentCustomSheet>:
-    orientation: "vertical"
-    size_hint_y: None
-    height: 250
-    bottom_date: bottom_date
-    prev_b: prev_b
-    next_b:next_b
-
-    MDBoxLayout:
-        adaptive_height: True
-        MDIconButton:
-            id: prev_b
-            icon: 'chevron-left'
-            on_release: root.change_date_prev()
-        MDLabel:
-            id: bottom_date
-            text: root.date_c()
-            halign: "center"
-        MDIconButton:
-            id: next_b
-            icon: 'chevron-right'
-            on_release: root.change_date_next()
-
-
-    GridLayout:
-        cols: 4
-        spacing: 20
-        padding: 30
-        Button:
-            id: Jan
-            text: "Jan"
-            on_press: app.go_back(self)
-        Button:
-            id:Feb
-            text: "Feb"
-            on_press: app.go_back(self)
-        Button:
-            id:Mar
-            text: "Mar"
-            on_press: app.go_back(self)
-
-        Button:
-            id:Apr
-            text: "Apr"
-            on_press: app.go_back(self)
-        Button:
-            id:May
-            text: "May"
-            on_press: app.go_back(self)
-        Button:
-            id:June
-            text: "June"
-            on_press: app.go_back(self)
-        Button:
-            id:July
-            text: "July"
-            on_press: app.go_back(self)
-        Button:
-            id:Aug
-            text: "Aug"
-            on_press: app.go_back(self)
-        Button:
-            id:Sept
-            text: "Sept"
-            on_press: app.go_back(self)
-        Button:
-            id:Oct
-            text: "Oct"
-            on_press: app.go_back(self)
-        Button:
-            id: Nov
-            text: "Nov"
-            on_press: app.go_back(self)
-        Button:
-            id: Dec
-            text: "Dec"
-            on_press: app.go_back(self)
-
-
+    MDLabel:
+        id: user_sem
+        text: ""

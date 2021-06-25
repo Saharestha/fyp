@@ -1,13 +1,15 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
-from kivymd.uix.list import ThreeLineListItem
-from kivymd.uix.picker import MDDatePicker
+from kivymd.uix.list import ThreeLineListItem, OneLineListItem
+from kivymd.uix.picker import MDDatePicker, MDTimePicker
 from kivymd.uix.textfield import MDTextField
 from kivy.properties import BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
+from kivymd.uix.menu import MDDropdownMenu
+from kivy.metrics import dp
 from kivy.uix.button import Button
 from kivymd.uix.button import MDFlatButton
+from kivy.uix.screenmanager import NoTransition, SlideTransition, RiseInTransition
 from kivy.factory import Factory
 from kivymd.uix.dialog import MDDialog
 from kivy.properties import ObjectProperty
@@ -18,46 +20,19 @@ import datetime
 import re
 from pages import *
 from kivy.core.window import Window
-Window.size = (450, 680)
-
+Window.size = (500, 700)
 
 db = sql.connect('D:\Documents\MIU\SPSDScheduler_FYP\scheduler.db')
 cur = db.cursor()
-regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
 months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July',
-                  'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
-query_select = "SELECT * from user_info"
-query_select_info = "SELECT * from student_uni_info"
-query_select_events = "SELECT * from student_events"
+          'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
 cur_date = datetime.datetime.now()
 cur_month = cur_date.strftime("%b")
 cur_year = cur_date.strftime("%Y")
 cur_month_num = cur_date.month
-check_change_date = False
 ch_date = cur_year
-ch_month = ""
-stu_id = ""
-user_name_signup = ""
-student_semester = ""
-
-
-class MyMDTextField(MDTextField):
-    password_mode = BooleanProperty(True)
-
-
-class see_events(BoxLayout):
-
-    cur.execute(query_select_events)
-    event_data = cur.fetchall()
-
-    def __init__(self, **kwargs):
-        super(see_events, self).__init__(**kwargs)
-        for eve in self.event_data:
-            if eve[5] == stu_id:
-                pass
-
-
+check_change_date = False
 
 
 class Content(BoxLayout):
@@ -82,13 +57,6 @@ class Content(BoxLayout):
             self.course_name.text = ""
             self.course_credit.text = ""
             self.course_code.text = ""
-
-
-
-class Tasks(BoxLayout):
-    pass
-
-
 
 
 class ContentCustomSheet(BoxLayout):
@@ -123,87 +91,102 @@ class ContentCustomSheet(BoxLayout):
 class Scheduler(MDApp):
     dialog = None
     dialog2 = None
+    taskeve_dialog = None
+    error_dialog = None
     global check_change_date
 
+    # Button Values/Icon for FLoatingActionButton
     data = {
-        "calendar-check": "Add Task",
-        "calendar-range": "Add Event"
+        "Add Task": "calendar-check",
+        "Add Event": "calendar-range"
     }
 
+    # instantiate Scheduler class
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    # build method to load kv file
     def build(self):
+        self.theme_cls.primary_palette = "DeepPurple"
+        self.theme_cls.accent_palette = "Indigo"
         self.strng = Builder.load_file("sch_kv.kv")
         return self.strng
 
+    # check login details
     def check_login_username(self):
-        global stu_id
-        self.user_name_login = self.strng.get_screen('LoginPage').ids.user_name.text
+        self.query_select = "SELECT * from user_info"
+        self.regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        self.user_email_login = self.strng.get_screen('LoginPage').ids.user_email.text
         self.user_pass_login = self.strng.get_screen('LoginPage').ids.user_pass.text
-        cur.execute(query_select)
+        self.strng.get_screen('LoginPage').ids.error_text.text = ""
+        self.strng.get_screen('LoginPage').ids.error_text.height = "0dp"
+        cur.execute(self.query_select)
         login_data = cur.fetchall()
 
-        if self.user_name_login != '' or self.user_pass_login != '':
-            if self.user_name_login.isdigit() or ' ' in self.user_name_login or len(self.user_name_login) < 3:
-                close_btn = MDFlatButton(text='Close', on_release = self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid Username", text="Enter valid username",
+        if self.user_email_login != '' or self.user_pass_login != '':
+            if not re.search(self.regex, self.user_email_login):
+                close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
+                self.error_dialog = MDDialog(title="Invalid Email", text="Enter valid email",
                                        size_hint=(0.7, 0.2), buttons=[close_btn])
-                self.dialog.open()
+                self.error_dialog.open()
             else:
                 for user_info in login_data:
-                    if user_info[1] == self.user_name_login and user_info[3] == self.user_pass_login:
-                        self.strng.get_screen('CalendarPage').ids.id_store.text = str(user_info[0])
+                    if user_info[2] == self.user_email_login and user_info[3] == self.user_pass_login:
+                        self.strng.get_screen('Store').ids.user_id.text = str(user_info[0])
+                        self.home_view()
                         self.strng.get_screen('Home').manager.current = 'Home'
                         break
 
-                    elif user_info[1] != self.user_name_login:
+                    elif user_info[2] != self.user_email_login:
                         self.strng.get_screen('LoginPage').ids.error_text.text = "User Doesn't exist"
                         self.strng.get_screen('LoginPage').ids.error_text.height = "3dp"
-
-
 
                     elif not user_info[3] != self.user_pass_login:
                         self.strng.get_screen('LoginPage').ids.error_text.text = "Incorrect email or password"
                         self.strng.get_screen('LoginPage').ids.error_text.height = "3dp"
 
 
-
+    # check signup details
     def check_signup_page(self):
-        global user_name_signup
-        user_name_signup = self.strng.get_screen('SignUpPage').ids.sign_username.text
+        self.query_select = "SELECT * from user_info"
+        self.regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        self.user_name_signup = self.strng.get_screen('SignUpPage').ids.sign_username.text
         self.user_email_signup = self.strng.get_screen('SignUpPage').ids.sign_useremail.text
         self.user_password_signup = self.strng.get_screen('SignUpPage').ids.sign_userpass.text
         self.user_conpass_signup = self.strng.get_screen('SignUpPage').ids.sign_con_userpass.text
-        cur.execute(query_select)
+        self.strng.get_screen('SignUpPage').ids.error_text_signup.text = ""
+        self.strng.get_screen('SignUpPage').ids.error_text_signup.height = "0dp"
+        cur.execute(self.query_select)
         self.signup_user_check = cur.fetchall()
-        if user_name_signup != '' or self.user_password_signup != '' or self.user_email_signup != '' or self.user_conpass_signup != '':
+        if self.user_name_signup != '' or self.user_password_signup != '' or self.user_email_signup != '' or self.user_conpass_signup != '':
             self.signup_check = True
 
             for user in self.signup_user_check:
-                if user[1] == user_name_signup or user[2] == self.user_email_signup:
+                if user[2] == self.user_email_signup:
                     self.strng.get_screen('SignUpPage').ids.error_text_signup.text = "User already exits"
                     self.strng.get_screen('SignUpPage').ids.error_text_signup.height = "3dp"
                     self.signup_check = False
                     break
 
-
-            if user_name_signup.isdigit() or ' ' in user_name_signup:
+            if self.user_name_signup.isdigit() or ' ' in self.user_name_signup:
                 close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid Username", text="Enter valid username", size_hint=(0.7, 0.2),
-                                       buttons=[close_btn])
-                self.dialog.open()
+                self.error_dialog = MDDialog(title="Invalid Username", text="Enter valid username", size_hint=(0.7, 0.2),
+                                             buttons=[close_btn])
+                self.error_dialog.open()
                 self.signup_check = False
 
-            elif not (re.search(regex, self.user_email_signup)):
+            elif not (re.search(self.regex, self.user_email_signup)):
                 close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid Email", text="Enter valid email", size_hint=(0.7, 0.2),
-                                       buttons=[close_btn])
-                self.dialog.open()
+                self.error_dialog = MDDialog(title="Invalid Email", text="Enter valid email", size_hint=(0.7, 0.2),
+                                             buttons=[close_btn])
+                self.error_dialog.open()
                 self.signup_check = False
 
             elif not len(self.user_password_signup) >= 8:
                 close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid Password", text="Password should be at least 8 characters", size_hint=(0.7, 0.2),
-                                       buttons=[close_btn])
-                self.dialog.open()
+                self.error_dialog = MDDialog(title="Invalid Password", text="Password should be at least 8 characters",
+                                             size_hint=(0.7, 0.2), buttons=[close_btn])
+                self.error_dialog.open()
                 self.signup_check = False
 
             elif self.user_password_signup != self.user_conpass_signup:
@@ -212,23 +195,18 @@ class Scheduler(MDApp):
                 self.signup_check = False
 
             if self.signup_check:
-                insert_user_sql = "INSERT INTO user_info(user_name, user_email, user_password) VALUES ('" + user_name_signup + "', '" + self.user_email_signup + "', '" + self.user_password_signup + "')"
-                cur.execute(insert_user_sql)
-                db.commit()
-                self.strng.get_screen('SignUpPage2').ids.pass_id.text = user_name_signup
+                self.strng.get_screen('SignUpPage2').manager.transition = NoTransition()
                 self.strng.get_screen('SignUpPage2').manager.current = 'SignUpPage2'
 
-
-
+    # check signup details Page2
     def check_signup2(self):
-        global student_semester
         self.student_prog = self.strng.get_screen('SignUpPage2').ids.stu_prog.text
         self.student_cgpa = self.strng.get_screen('SignUpPage2').ids.stu_cgpa.text
-        student_semester = self.strng.get_screen('SignUpPage2').ids.stu_sem.text
+        self.student_semester = self.strng.get_screen('SignUpPage2').ids.stu_sem.text
         self.student_subject = self.strng.get_screen('SignUpPage2').ids.stu_subs.text
-        cur.execute(query_select)
+        cur.execute(self.query_select)
         self.signup2_user_check = cur.fetchall()
-        if self.student_prog != '' or self.student_cgpa != '' or student_semester != '' or self.student_subject != '':
+        if self.student_prog != '' or self.student_cgpa != '' or self.student_semester != '' or self.student_subject != '':
             self.signup2_check = True
             try:
                 # Convert it into float
@@ -238,126 +216,48 @@ class Scheduler(MDApp):
 
             if not self.signup_check or self.st > 4 or self.st < 0:
                 close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid CGPA", text="Enter valid CGPA (eg. 3.50)", size_hint=(0.7, 0.2),
+                self.error_dialog = MDDialog(title="Invalid CGPA", text="Enter valid CGPA (eg. 3.50)",
+                                       size_hint=(0.7, 0.2),
                                        buttons=[close_btn])
-                self.dialog.open()
+                self.error_dialog.open()
                 self.signup2_check = False
 
-            if not student_semester.isdigit() or int(student_semester) < 0:
+            if not self.student_semester.isdigit() or int(self.student_semester) < 0:
                 close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid Semester", text="Enter valid semester", size_hint=(0.7, 0.2),
+                self.error_dialog = MDDialog(title="Invalid Semester", text="Enter valid semester", size_hint=(0.7, 0.2),
                                        buttons=[close_btn])
-                self.dialog.open()
-                self.signup2_check = False
-
-
-
-            elif not self.student_subject.isdigit() or int(self.student_subject) < 0:
-                close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
-                self.dialog = MDDialog(title="Invalid number of Subjects", text="Enter valid number", size_hint=(0.7, 0.2),
-                                       buttons=[close_btn])
-                self.dialog.open()
+                self.error_dialog.open()
                 self.signup2_check = False
 
             if self.signup2_check:
-
-                global no_subjects
-                no_subjects = int(self.student_subject)
-                for user in self.signup2_user_check:
-                    if user[1] == user_name_signup:
-                        self.strng.get_screen('CalendarPage').ids.id_store.text = str(user[0])
-                        break
-                self.stu_id = self.strng.get_screen('CalendarPage').ids.id_store.text
-                insert_user_sql = "INSERT INTO student_uni_info(stu_program, stu_CGPA, stu_sem, stu_no_subjects, user_id) VALUES('" + self.student_prog + "'," + self.student_cgpa + ", " + student_semester + "," + self.student_subject + "," + self.stu_id + ")"
-                cur.execute(insert_user_sql)
+                insert_query = "INSERT INTO user_info(user_name, user_email, user_password) " \
+                               "VALUES('" + self.user_name_signup + "', '" + self.user_email_signup + "', '" + self.user_password_signup + "')"
+                cur.execute(insert_query)
                 db.commit()
+                cur.execute(self.query_select)
+                user_details = cur.fetchall()
+                for u_id in user_details:
+                    if u_id[2] == self.user_email_signup:
+                        self.id = str(u_id[0])
+                        self.strng.get_screen('Store').ids.user_id.text = self.id
+
+                insert_query2 = "INSERT INTO student_uni_info(stu_program, stu_CGPA, stu_sem, user_id) " \
+                                "VALUES('" + self.student_prog + "', '" + self.student_cgpa + "', " + self.student_semester + ", " + self.id + ")"
+                cur.execute(insert_query2)
+                db.commit()
+
+                self.strng.get_screen('Store').ids.user_sem.text = str(self.student_semester)
+
+                self.strng.get_screen('SignUpPage2').manager.transition = NoTransition()
                 self.strng.get_screen('SignUpPage3').manager.current = 'SignUpPage3'
 
+
+    # close error dialog box for SignUpPage
     def close_username_dialog(self, obj):
-        self.dialog.dismiss()
+        self.error_dialog.dismiss()
 
-    def close_page(self):
-        self.strng.get_screen('Home').manager.current = "Home"
-
-    def home_view(self):
-        cur.execute(query_select_events)
-        all_events = cur.fetchall()
-        print(type(self.strng.get_screen('CalendarPage').ids.id_store.text))
-        #self.strng.get_screen('Home').ids.view_all.add_widget(ThreeLineListItem(text="yo", secondary_text="all_eve[2]"))
-
-        for all_eve in all_events:
-
-            if all_eve[5] == int(self.strng.get_screen('CalendarPage').ids.id_store.text):
-                self.strng.get_screen('Home').ids.view_all.add_widget(ThreeLineListItem(text=all_eve[1], secondary_text=all_eve[2]))
-
-
-    def calendarPage_title(self):
-        global check_change_date
-        self.cal_cur_title = cur_month + " " + cur_year
-        check_change_date = False
-        self.strng.get_screen('CalendarPage').ids.cal_tool.title = self.cal_cur_title
-        self.strng.get_screen('CalendarPage').manager.current = 'CalendarPage'
-
-
-    def go_back(self, instance):
-        global ch_month
-        global check_change_date
-        ch_month = instance.text
-        self.create_calendar(instance)
-        self.cal_sel_title = ch_month + " " + ContentCustomSheet().bottom_date.text
-        self.strng.get_screen('CalendarPage').ids.cal_tool.title = self.cal_sel_title
-        self.custom_sheet.dismiss()
-        #self.strng.get_screen('CalendarPage').manager.current = 'CalendarPage'
-
-    def show_example_custom_bottom_sheet(self):
-        self.custom_sheet = MDCustomBottomSheet(screen=Factory.ContentCustomSheet())
-        self.custom_sheet.open()
-
-
-    def calendarPicker(self):
-        date_dialog = MDDatePicker(callback=self.got_date)
-        date_dialog.open()
-
-    def got_date(self, the_date):
-        print(the_date)
-
-    def create_calendar(self, instance):
-
-        self.date = ""
-        if instance.text == "Calendar":
-            self.c = calendar.monthcalendar(int(cur_year), int(cur_month_num))
-        else:
-            for m in months:
-                if instance.text == m:
-                    self.date = months.index(m) + 1
-
-            self.c = calendar.monthcalendar(int(ch_date), self.date)
-        self.strng.get_screen('CalendarPage').ids.calendar_space.clear_widgets()
-        for i in self.c:
-            for j in i:
-                if j == 0:
-                    self.strng.get_screen("CalendarPage").ids.calendar_space.add_widget(Button(on_release=self.on_release,
-                                                                                               text='{j}'.format(j='')))
-                else:
-                    self.strng.get_screen("CalendarPage").ids.calendar_space.add_widget(Button(on_release=self.on_release,
-                                                                                               text='{j}'.format(j=j)))
-
-    def on_release(self, obj):
-        if not self.dialog2:
-            self.dialog2 = MDDialog(
-                title="Events for the Day:",
-                type="custom",
-                size_hint_x=None,
-                width="300dp",
-                content_cls= see_events(),
-
-            )
-        self.dialog2.open()
-
-
-
+    #SignupPAge 3 add subjects
     def add_subject_dialog(self):
-
         if not self.dialog:
             self.dialog = MDDialog(
                 title="Add Subject:",
@@ -372,17 +272,225 @@ class Scheduler(MDApp):
     def close_dialog(self):
         self.dialog.dismiss()
 
+    # Show all pending task in Home page of the User
+    def home_view(self):
+        self.query_select_events = "SELECT * from students_task"
+        cur.execute(self.query_select_events)
+        self.strng.get_screen('Home').ids.view_all.clear_widgets()
+        all_events = cur.fetchall()
+        for all_eve in all_events:
+            if all_eve[6] == int(self.strng.get_screen('Store').ids.user_id.text):
+                self.strng.get_screen('Home').ids.view_all.add_widget(ThreeLineListItem(text=all_eve[1], secondary_text=all_eve[2]))
+
+    # Set the date for calenderPage title bar to current Date
+    def calendarPage_title(self):
+        global check_change_date
+        self.cal_cur_title = cur_month + " " + cur_year
+        check_change_date = False
+        self.strng.get_screen('CalendarPage').ids.cal_tool.title = self.cal_cur_title
+        self.strng.get_screen('CalendarPage').manager.current = 'CalendarPage'
+
+    # To create calendar in Calendar Page
+    def create_calendar(self, instance):
+        self.date = ""
+        if instance.text == "Calendar":
+            self.c = calendar.monthcalendar(int(cur_year), int(cur_month_num))
+        else:
+            for m in months:
+                if instance.text == m:
+                    self.date = months.index(m) + 1
+            self.c = calendar.monthcalendar(int(ch_date), self.date)
+        self.strng.get_screen('CalendarPage').ids.calendar_space.clear_widgets()
+        for i in self.c:
+            for j in i:
+                if j == 0:
+                    self.strng.get_screen("CalendarPage").ids.calendar_space.add_widget(
+                        Button(on_release=self.on_release,
+                               text='{j}'.format(j='')))
+                else:
+                    self.strng.get_screen("CalendarPage").ids.calendar_space.add_widget(
+                        Button(on_release=self.on_release,
+                               text='{j}'.format(j=j)))
+
+    # Go from calender page to Home Screen
+    def close_page(self):
+        self.strng.get_screen('Home').manager.current = "Home"
+
+    # To open an overlay to view the events/tasks for the day
+    def on_release(self, obj):
+        pass
+    #    if not self.dialog2:
+    #        self.dialog2 = MDDialog(
+    #            title="Events for the Day:",
+    #            type="custom",
+    #            size_hint_x=None,
+    #            width="300dp",
+    #            content_cls= SeeEvents(),
+    #        )
+    #    self.dialog2.open()
+    #    SeeEvents().show_all()
+
+    # Show bottom nav in Calendar page
+    def select_calendar(self):
+        self.custom_sheet = MDCustomBottomSheet(screen=Factory.ContentCustomSheet())
+        self.custom_sheet.open()
+
+    # Change the date for calendarPage title bar after Selecting Date from bottom nav bar
+    def go_back(self, instance):
+        global ch_month
+        global check_change_date
+        ch_month = instance.text
+        self.create_calendar(instance)
+        self.cal_sel_title = ch_month + " " + ContentCustomSheet().bottom_date.text
+        self.strng.get_screen('CalendarPage').ids.cal_tool.title = self.cal_sel_title
+        self.custom_sheet.dismiss()
+
+    # To open Floating ActionButton
     def callback(self, instance):
         if instance.icon == "calendar-check":
+            self.strng.get_screen('TaskScreen').manager.transition = SlideTransition(direction="down")
             self.strng.get_screen('TaskScreen').manager.current = 'TaskScreen'
         else:
+            self.strng.get_screen('EventScreen').manager.transition = RiseInTransition()
             self.strng.get_screen('EventScreen').manager.current = 'EventScreen'
 
+    #datePicker for task/event
+    def date_picker(self, instance):
+        print(type(instance.icon))
+        self.x = datetime.datetime.now()
+        self.date_dialog = MDDatePicker(year=int(self.x.strftime("%Y")),
+                                        month=int(self.x.strftime("%m")), day=int(self.x.strftime("%d")))
+        if instance.icon == "calendar-month":
+            self.date_dialog.bind(on_save=self.on_task_save, on_cancel=self.on_cancel)
+        else:
+            self.date_dialog.bind(on_save=self.on_event_save, on_cancel=self.on_cancel)
+        self.date_dialog.open()
+
+    # Selected date for task
+    def on_task_save(self, instance, value, date_range):
+        self.strng.get_screen('TaskScreen').ids.due_date.text = f'{value}'
+
+    # Selected date for event
+    def on_event_save(self, instance, value, date_range):
+        self.strng.get_screen('EventScreen').ids.eve_date.text = f'{value}'
+
+    # To close the calender dialog box
+    def on_cancel(self, instance, value):
+        self.date_dialog.close()
+
+    # dropdown menu to show subjects
+    def drop_subs(self):
+        self.query_select_sub = "SELECT * from student_subjects"
+        cur.execute(self.query_select_sub)
+        all_sub = cur.fetchall()
+
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "icon": "git",
+                "height": dp(56),
+                "text": f"{i[2]}",
+                "on_release": lambda x=f"{i[2]}": self.set_item(x),
+            } for i in all_sub if i[5] == int(self.strng.get_screen('Store').ids.user_id.text)]
+        self.menu = MDDropdownMenu(
+            caller=self.strng.get_screen('TaskScreen').ids.task_sub,
+            items=menu_items,
+            position="bottom",
+            width_mult=4,
+        )
+        self.menu.open()
+        self.strng.get_screen('TaskScreen').ids.task_sub.focus = False
+
+    # Put selected subject in the textbox
+    def set_item(self, text__item):
+        self.strng.get_screen('TaskScreen').ids.task_sub.text = text__item
+        self.menu.dismiss()
+
+    # add task to the database
+    def add_task(self):
+        self.type_task = ""
+        self.task_name = self.strng.get_screen('TaskScreen').ids.task_name.text
+        if self.strng.get_screen('TaskScreen').ids.exam.state == "down":
+            self.type_task = "Exam"
+        else:
+            self.type_task = "Assignment"
+        self.due_date = self.strng.get_screen('TaskScreen').ids.due_date.text
+        self.marks_per = self.strng.get_screen('TaskScreen').ids.percent.text
+        self.subject = self.strng.get_screen('TaskScreen').ids.task_sub.text
+        self.id = self.strng.get_screen('Store').ids.user_id.text
+
+        if self.task_name != "" and self.type_task !="" and self.due_date != "" and self.marks_per != "" and self.subject != "":
+            self.insert_task = "INSERT INTO students_task(task_type, task_name, sub_name, " \
+                               "task_due_date, marks_percentage,user_id) VALUES('" + self.type_task + "', '" + self.task_name + "','" + self.subject + "', '" + self.due_date + "', "+self.marks_per + ", "+self.id+")"
+            cur.execute(self.insert_task)
+            db.commit()
+            self.home_view()
+            self.strng.get_screen('Home').manager.current = 'Home'
+
+        else:
+            close_btn = MDFlatButton(text='Close', on_release=self.close_taskeve)
+            self.taskeve_dialog = MDDialog(title="Empty inputs", text="All info are required", size_hint=(0.7, 0.2),
+                                           buttons=[close_btn])
+            self.taskeve_dialog.open()
+
+    # add event to the database
+    def add_event(self):
+        self.event_name = self.strng.get_screen('EventScreen').ids.event_name.text
+        self.eve_date = self.strng.get_screen('EventScreen').ids.eve_date.text
+        self.eve_time_start = self.strng.get_screen('EventScreen').ids.eve_time_start.text
+        self.eve_time_end = self.strng.get_screen('EventScreen').ids.eve_time_end.text
+        self.id = self.strng.get_screen('Store').ids.user_id.text
+
+        if self.event_name != "" and self.eve_date !="" and self.eve_time_start != "" and self.eve_time_end != "":
+            self.insert_event = "INSERT INTO student_events(event_name, event_date, event_start_time,event_end, user_id) " \
+                                "VALUES('" + self.event_name + "', '" + self.eve_date + "','" + self.eve_time_start + "', '" + self.eve_time_end + "', "+self.id+")"
+            cur.execute(self.insert_event)
+            db.commit()
+            self.home_view()
+            self.strng.get_screen('Home').manager.current = 'Home'
+
+        else:
+            close_btn = MDFlatButton(text='Close', on_release=self.close_taskeve)
+            self.taskeve_dialog = MDDialog(title="Empty inputs", text="All info are required", size_hint=(0.7, 0.2),
+                                           buttons=[close_btn])
+            self.taskeve_dialog.open()
+
+    # Close error dialog box on task/eve page
+    def close_taskeve(self, obj):
+        self.taskeve_dialog.dismiss()
+
+    # To pick time for Event
+    def timePicker_start(self):
+        self.time_dialog = MDTimePicker()
+        self.time_dialog.bind(on_cancel=self.on_can, time=self.on_ok)
+        self.strng.get_screen('EventScreen').ids.eve_time_start.focus = False
+        self.time_dialog.open()
 
 
+    # to save the time for the event
+    def on_ok(self, instance, time):
+        self.strng.get_screen('EventScreen').ids.eve_time_start.text = str(time)
 
+    # To pick time for Event
+    def timePicker_end(self):
 
+        self.time_dialog = MDTimePicker()
+        self.time_dialog.bind(on_cancel=self.on_can, time=self.on_okay)
+        self.strng.get_screen('EventScreen').ids.eve_time_end.focus = False
+        self.time_dialog.open()
 
+    # to save the time for the event
+    def on_okay(self, instance, time):
+        self.strng.get_screen('EventScreen').ids.eve_time_end.text = str(time)
 
+    # to close the time dialog box
+    def on_can(self, instance, time):
+        self.time_dialog.close()
+
+    # After Logout
+    def clear_all(self):
+        self.strng.get_screen('Store').ids.user_sem.text = ""
+        self.strng.get_screen('Store').ids.user_id.text = ""
 
 Scheduler().run()
+
