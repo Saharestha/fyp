@@ -9,6 +9,7 @@ ScreenManager:
     ProfilePage:
     EventScreen:
     TaskScreen:
+    CgpaPage:
     Store:
 
 <LoginPage>
@@ -416,6 +417,9 @@ ScreenManager:
 
                         OneLineIconListItem:
                             text: 'CGPA Calculator'
+                            on_release:
+                                app.add_cgpa()
+                                root.manager.current = "CgpaPage"
                             IconLeftWidget:
                                 icon: 'calculator'
 
@@ -503,7 +507,7 @@ ScreenManager:
                 pos_hint: {"center_x": 0.5}
                 size_hint_x: None
                 width: 190
-                on_focus: app.drop_subs()
+                on_focus: if self.focus: app.drop_subs()
 
         GridLayout:
             cols: 2
@@ -634,7 +638,7 @@ ScreenManager:
                 color_mode:'custom'
                 current_hint_text_color: app.theme_cls.accent_color
                 line_color_focus: app.theme_cls.accent_color
-                on_focus: app.timePicker_start()
+                on_focus: if self.focus: app.timePicker_start()
 
 
             MDTextField:
@@ -645,7 +649,7 @@ ScreenManager:
                 color_mode:'custom'
                 current_hint_text_color: app.theme_cls.accent_color
                 line_color_focus: app.theme_cls.accent_color
-                on_focus: app.timePicker_end()
+                on_focus: if self.focus: app.timePicker_end()
 
         GridLayout:
             cols: 2
@@ -810,16 +814,20 @@ ScreenManager:
                 BoxLayout:
                     orientation: 'vertical'
                     spacing: 20
+
                     MDToolbar:
                         title: 'Profile Settings'
                         elevation:10
                         left_action_items: [['close', lambda x : app.close_page()]]
                     Widget:
+                        size_hint_y: None
+                        height: 0
 
                     MDCard:
                         size_hint: (.9, None)
                         height: dp(120)
                         pos_hint: {'center_x': 0.5}
+                        elevation: 25
                         BoxLayout:
                             orientation:'vertical'
                             padding: dp(8)
@@ -831,18 +839,20 @@ ScreenManager:
                                     font_size: '15'
                                     height: dp(36)
                                 MDIconButton:
-                                    icon: 'android'
+                                    icon: 'pencil'
 
 
                             MDSeparator:
                                 height: dp(1)
                             MDLabel:
-                                text: 'Body'
+                                id: ch_user_name
+                                text: ""
                                 font_style: "Body2"
                     MDCard:
                         size_hint: (.9, None)
                         height: dp(120)
                         pos_hint: {'center_x': 0.5}
+                        elevation: 25
                         BoxLayout:
                             orientation:'vertical'
                             padding: dp(8)
@@ -854,16 +864,18 @@ ScreenManager:
                                     font_size: '15'
                                     height: dp(36)
                                 MDIconButton:
-                                    icon: 'android'
+                                    icon: 'pencil'
                             MDSeparator:
                                 height: dp(1)
                             MDLabel:
-                                text: 'Body'
+                                id: ch_user_email
+                                text: ""
                                 font_style: "Body2"
                     MDCard:
                         size_hint: (.9, None)
                         height: dp(120)
                         pos_hint: {'center_x': 0.5}
+                        elevation: 25
                         BoxLayout:
                             orientation:'vertical'
                             padding: dp(8)
@@ -875,14 +887,218 @@ ScreenManager:
                                     font_size: '15'
                                     height: dp(36)
                                 MDIconButton:
-                                    icon: 'android'
+                                    icon: 'pencil'
                             MDSeparator:
                                 height: dp(1)
                             MDLabel:
-                                text: 'Body'
+                                id: ch_user_pass
+                                text: ""
                                 font_style: "Body2"
 
                     Widget:
+
+
+<CgpaPage>
+    name: "CgpaPage"
+    MDNavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: "vertical"
+                    pos_hint: {"center_x": 0.5, "center_y":0.5}
+                    MDToolbar:
+                        title: 'CGPA Calculator'
+                        elevation:10
+                        left_action_items: [['close', lambda x : app.close_page()]]
+
+
+                    MDLabel:
+                        text: "Enter your estimated grades!!"
+                        halign: 'center'
+                        size_hint_y: None
+                        height: 100
+                    GridLayout:
+                        id: grid_cgpa
+                        cols: 3
+                        size_hint: None, None
+                        width: 400
+                        pos_hint: {"center_x": 0.5}
+                        padding: [30, 0]
+                        spacing: [20, 0]
+                        MDTextField:
+                            size_hint_x: None
+                            width: 150
+                            font_size: 15
+                            hint_text: 'Subject'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: cre_1
+                            size_hint_x: None
+                            width: 100
+                            font_size: 15
+                            hint_text: 'Credit Hours'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: gra_1
+                            size_hint_x: None
+                            width: 75
+                            font_size: 15
+                            hint_text: 'Grade'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                            on_focus: if self.focus: app.drop_gra(self)
+                        MDTextField:
+                            size_hint_x: None
+                            width: 150
+                            font_size: 15
+                            hint_text: 'Subject'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: cre_2
+                            size_hint_x: None
+                            width: 100
+                            font_size: 15
+                            hint_text: 'Credit Hours'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: gra_2
+                            size_hint_x: None
+                            width: 75
+                            font_size: 15
+                            hint_text: 'Grade'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                            on_focus: if self.focus: app.drop_gra(self)
+                        MDTextField:
+                            size_hint_x: None
+                            width: 150
+                            font_size: 15
+                            hint_text: 'Subject'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: cre_3
+                            size_hint_x: None
+                            width: 100
+                            font_size: 15
+                            hint_text: 'Credit Hours'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: gra_3
+                            size_hint_x: None
+                            width: 75
+                            font_size: 15
+                            hint_text: 'Grade'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                            on_focus: if self.focus: app.drop_gra(self)
+                        MDTextField:
+                            size_hint_x: None
+                            width: 150
+                            font_size: 15
+                            hint_text: 'Subject'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: cre_4
+                            size_hint_x: None
+                            width: 100
+                            font_size: 15
+                            hint_text: 'Credit Hours'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: gra_4
+                            size_hint_x: None
+                            width: 75
+                            font_size: 15
+                            hint_text: 'Grade'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                            on_focus: if self.focus: app.drop_gra(self)
+                        MDTextField:
+                            size_hint_x: None
+                            width: 150
+                            font_size: 15
+                            hint_text: 'Subject'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: cre_5
+                            size_hint_x: None
+                            width: 100
+                            font_size: 15
+                            hint_text: 'Credit Hours'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                        MDTextField:
+                            id: gra_5
+                            size_hint_x: None
+                            width: 75
+                            font_size: 15
+                            hint_text: 'Grade'
+                            pos_hint: {"center_x": 0.5}
+                            color_mode: 'custom'
+                            current_hint_text_color: self.theme_cls.accent_color
+                            line_color_focus: self.theme_cls.accent_color
+                            on_focus: if self.focus: app.drop_gra(self)
+                    Widget:
+
+                    MDLabel:
+                        id: result
+                        text: "CGPA is: "
+                        size_hint: None, None
+                        pos_hint: {"center_x": 0.5, "center_y": 0.9}
+
+                    MDFloatingActionButton:
+                        icon: "calculator-variant"
+                        md_bg_color: app.theme_cls.primary_color
+                        pos_hint: {"center_x": 0.5, "center_y": 0.9}
+                        size_hint: None, None
+                        on_release:
+                            app.calculate_gpa()
+
+                    Widget:
+
+
+
+
+
+
+
 
 
 <Store>

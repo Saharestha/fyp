@@ -1,15 +1,14 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
-from kivymd.uix.list import ThreeLineListItem, OneLineListItem
+from kivymd.uix.list import ThreeLineListItem
 from kivymd.uix.picker import MDDatePicker, MDTimePicker
 from kivymd.uix.textfield import MDTextField
-from kivy.properties import BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.metrics import dp
 from kivy.uix.button import Button
 from kivymd.uix.button import MDFlatButton
-from kivy.uix.screenmanager import NoTransition, SlideTransition, RiseInTransition
+from kivy.uix.screenmanager import NoTransition, SlideTransition
 from kivy.factory import Factory
 from kivymd.uix.dialog import MDDialog
 from kivy.properties import ObjectProperty
@@ -19,20 +18,36 @@ import calendar
 import datetime
 import re
 from pages import *
-from kivy.core.window import Window
-Window.size = (500, 700)
+
 
 db = sql.connect('D:\Documents\MIU\SPSDScheduler_FYP\scheduler.db')
 cur = db.cursor()
 
 months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July',
           'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+grades = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "D", "F"]
 cur_date = datetime.datetime.now()
 cur_month = cur_date.strftime("%b")
 cur_year = cur_date.strftime("%Y")
 cur_month_num = cur_date.month
 ch_date = cur_year
+
 check_change_date = False
+
+
+class CourseGra(MDTextField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class CourseCreHrs(MDTextField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class CurrentGp(MDDialog):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Content(BoxLayout):
@@ -48,10 +63,9 @@ class Content(BoxLayout):
         if self.course_name != "" and self.course_code != "" and self.course_credit != "":
             insert_subject = "INSERT INTO student_subjects(sub_cou_code, sub_name, sub_cre_hrs," \
                              "stu_sem, user_id) VALUES" \
-                             "('"+self.course_code+"', '" + self.course_name+"','"+self.course_credit+"','" + student_semester + "','"+stu_id+"')"
+                             "('"+self.course_code+"', '" + self.course_name+"','"+self.course_credit+"','4','57')"
             cur.execute(insert_subject)
             db.commit()
-
 
         if instance.text == "Add_next":
             self.course_name.text = ""
@@ -95,7 +109,7 @@ class Scheduler(MDApp):
     error_dialog = None
     global check_change_date
 
-    # Button Values/Icon for FLoatingActionButton
+    # Button Values/Icon for Floating ActionButton
     data = {
         "Add Task": "calendar-check",
         "Add Event": "calendar-range"
@@ -107,7 +121,7 @@ class Scheduler(MDApp):
 
     # build method to load kv file
     def build(self):
-        self.theme_cls.primary_palette = "DeepPurple"
+        self.theme_cls.primary_palette = "Blue"
         self.theme_cls.accent_palette = "Indigo"
         self.strng = Builder.load_file("sch_kv.kv")
         return self.strng
@@ -133,6 +147,9 @@ class Scheduler(MDApp):
                 for user_info in login_data:
                     if user_info[2] == self.user_email_login and user_info[3] == self.user_pass_login:
                         self.strng.get_screen('Store').ids.user_id.text = str(user_info[0])
+                        self.strng.get_screen('ProfilePage').ids.ch_user_name.text = str(user_info[1])
+                        self.strng.get_screen('ProfilePage').ids.ch_user_email.text = str(user_info[2])
+                        self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = str(user_info[3])
                         self.home_view()
                         self.strng.get_screen('Home').manager.current = 'Home'
                         break
@@ -203,10 +220,9 @@ class Scheduler(MDApp):
         self.student_prog = self.strng.get_screen('SignUpPage2').ids.stu_prog.text
         self.student_cgpa = self.strng.get_screen('SignUpPage2').ids.stu_cgpa.text
         self.student_semester = self.strng.get_screen('SignUpPage2').ids.stu_sem.text
-        self.student_subject = self.strng.get_screen('SignUpPage2').ids.stu_subs.text
         cur.execute(self.query_select)
         self.signup2_user_check = cur.fetchall()
-        if self.student_prog != '' or self.student_cgpa != '' or self.student_semester != '' or self.student_subject != '':
+        if self.student_prog != '' or self.student_cgpa != '' or self.student_semester != '':
             self.signup2_check = True
             try:
                 # Convert it into float
@@ -351,12 +367,11 @@ class Scheduler(MDApp):
             self.strng.get_screen('TaskScreen').manager.transition = SlideTransition(direction="down")
             self.strng.get_screen('TaskScreen').manager.current = 'TaskScreen'
         else:
-            self.strng.get_screen('EventScreen').manager.transition = RiseInTransition()
+            self.strng.get_screen('EventScreen').manager.transition = SlideTransition(direction="down")
             self.strng.get_screen('EventScreen').manager.current = 'EventScreen'
 
     #datePicker for task/event
     def date_picker(self, instance):
-        print(type(instance.icon))
         self.x = datetime.datetime.now()
         self.date_dialog = MDDatePicker(year=int(self.x.strftime("%Y")),
                                         month=int(self.x.strftime("%m")), day=int(self.x.strftime("%d")))
@@ -399,7 +414,6 @@ class Scheduler(MDApp):
             width_mult=4,
         )
         self.menu.open()
-        self.strng.get_screen('TaskScreen').ids.task_sub.focus = False
 
     # Put selected subject in the textbox
     def set_item(self, text__item):
@@ -463,7 +477,6 @@ class Scheduler(MDApp):
     def timePicker_start(self):
         self.time_dialog = MDTimePicker()
         self.time_dialog.bind(on_cancel=self.on_can, time=self.on_ok)
-        self.strng.get_screen('EventScreen').ids.eve_time_start.focus = False
         self.time_dialog.open()
 
 
@@ -473,10 +486,8 @@ class Scheduler(MDApp):
 
     # To pick time for Event
     def timePicker_end(self):
-
         self.time_dialog = MDTimePicker()
         self.time_dialog.bind(on_cancel=self.on_can, time=self.on_okay)
-        self.strng.get_screen('EventScreen').ids.eve_time_end.focus = False
         self.time_dialog.open()
 
     # to save the time for the event
@@ -487,8 +498,87 @@ class Scheduler(MDApp):
     def on_can(self, instance, time):
         self.time_dialog.close()
 
+    def calculate_gpa(self):
+        self.cre_hrs = []
+        self.gra = []
+        self.multi = 1
+        self.sum = 0
+        self.cre_hrs.append(self.strng.get_screen('CgpaPage').ids.cre_1.text)
+        self.cre_hrs.append(self.strng.get_screen('CgpaPage').ids.cre_2.text)
+        self.cre_hrs.append(self.strng.get_screen('CgpaPage').ids.cre_3.text)
+        self.cre_hrs.append(self.strng.get_screen('CgpaPage').ids.cre_4.text)
+        self.cre_hrs.append(self.strng.get_screen('CgpaPage').ids.cre_5.text)
+        self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_1.text))
+        self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_2.text))
+        self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_3.text))
+        self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_4.text))
+        self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_5.text))
+        for (i, j) in zip(self.cre_hrs, self.gra):
+            i = int(i)
+            if i != "" and i <= 4 and j != "":
+                self.multi += i * j
+                self.sum += i
+            else:
+                close_btn = MDFlatButton(text='Close', on_release=self.close_cgpa_dialog)
+                self.err_cgpa_dialog = MDDialog(title="Invalid Semester", text="Enter valid semester",
+                                                size_hint=(0.7, 0.2),
+                                                buttons=[close_btn])
+                self.err_cgpa_dialog.open()
+
+        self.result = round(self.multi/self.sum, 2)
+        self.strng.get_screen('CgpaPage').ids.result.text = f"CGPA is: {self.result}"
+
+    def close_cgpa_dialog(self, obj):
+        self.err_cgpa_dialog.dismiss()
+
+    # dropdown menu to show subjects
+    def drop_gra(self, instance):
+        gra_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "icon": "git",
+                "height": dp(56),
+                "text": f"{i}",
+                "on_release": lambda x=f"{i}": self.set_gra(x, instance),
+            } for i in grades]
+        self.gra_menu = MDDropdownMenu(
+            caller=instance,
+            items=gra_items,
+            position="bottom",
+            width_mult=4,
+        )
+        self.gra_menu.open()
+
+    # Put selected subject in the textbox
+    def set_gra(self, text__item, instance):
+        instance.text = text__item
+        self.gra_menu.dismiss()
+
+    # change grades to gpa
+    def ch_gra(self, grade):
+        if grade == "A+" or grade == "A":
+            return 4.00
+        elif grade == "A-":
+            return 3.67
+        elif grade == "B+":
+            return 3.33
+        elif grade == "B":
+            return 3.00
+        elif grade == "B-":
+            return 2.67
+        elif grade == "C+":
+            return 2.33
+        elif grade == "C":
+            return 2.00
+        elif grade == "D":
+            return 1.67
+        elif grade == "F":
+            return 0.00
+
+
     # After Logout
     def clear_all(self):
+        self.strng.get_screen('LoginPage').ids.user_pass.text = ""
         self.strng.get_screen('Store').ids.user_sem.text = ""
         self.strng.get_screen('Store').ids.user_id.text = ""
 

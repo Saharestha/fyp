@@ -22,7 +22,7 @@ class Home(Screen):
 
 
 class CalendarPage(Screen):
-    pass
+    passs
 
 
 class ProfilePage(Screen):
@@ -34,6 +34,10 @@ class TaskScreen(Screen):
 
 
 class EventScreen(Screen):
+    pass
+
+
+class CgpaPage(Screen):
     pass
 
 
@@ -53,4 +57,5 @@ sm.add_widget(CalendarPage(name="CalendarPage"))
 sm.add_widget(ProfilePage(name="ProfilePage"))
 sm.add_widget(TaskScreen(name="TaskScreen"))
 sm.add_widget(EventScreen(name="EventScreen"))
+sm.add_widget(CgpaPage(name="CgpaPage"))
 sm.add_widget(Store(name="Store"))
