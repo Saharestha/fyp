@@ -249,9 +249,39 @@ ScreenManager:
             line_color_focus: app.theme_cls.accent_color
             required: True
 
+        MDLabel:
+            text: "Select study time"
+        GridLayout:
+            cols: 2
+            size_hint_x: None
+            width: 250
+            pos_hint: {"center_x": 0.5}
+            spacing: [30, 0]
+            MDTextField:
+                id: study_time_start
+                text: ""
+                hint_text: "From"
+                pos_hint: {"center_x": 0.5}
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                on_focus: if self.focus: app.study_start()
+
+
+            MDTextField:
+                id: study_time_end
+                text: ""
+                hint_text: "To"
+                pos_hint: {"center_x": 0.5}
+                color_mode:'custom'
+                current_hint_text_color: app.theme_cls.accent_color
+                line_color_focus: app.theme_cls.accent_color
+                on_focus: if self.focus: app.study_end()
+
 
         BoxLayout:
-
+            size_hint_y: None
+            height: 100
             MDFlatButton:
                 text: "Go Back"
                 text_color: self.theme_cls.primary_color
@@ -449,9 +479,9 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 210
+            width: 270
             required: True
-            font_size: 25
+            font_size: 16
             pos_hint: {"center_x": 0.5}
 
         GridLayout:
@@ -592,9 +622,9 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 210
+            width: 270
             required: True
-            font_size: 25
+            font_size: 16
             pos_hint: {"center_x": 0.5}
 
         GridLayout:

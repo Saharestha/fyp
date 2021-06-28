@@ -73,7 +73,8 @@ class Content(BoxLayout):
                              "('"+self.course_code.text+"', '"+self.course_name.text+"', "+self.course_credit.text+" , "+stu_sem+", "+stu_id+")"
             cur.execute(insert_subject)
             db.commit()
-           # os.mkdir(f"D:\Documents\MIU\SPSDSchedular\{self.course_name}")
+            os.mkdir("D:\Documents\MIU\SPSDSchedular\%s",  self.course_name.text)
+            )
 
         if instance.text == "Add_next":
             self.course_name.text = ""
@@ -237,9 +238,11 @@ class Scheduler(MDApp):
         self.student_prog = self.strng.get_screen('SignUpPage2').ids.stu_prog.text
         self.student_cgpa = self.strng.get_screen('SignUpPage2').ids.stu_cgpa.text
         self.student_semester = self.strng.get_screen('SignUpPage2').ids.stu_sem.text
+        self.study_time_s = self.strng.get_screen('SignUpPage2').ids.study_time_start.text
+        self.study_time_e = self.strng.get_screen('SignUpPage2').ids.study_time_end.text
         cur.execute(self.query_select)
         self.signup2_user_check = cur.fetchall()
-        if self.student_prog != '' or self.student_cgpa != '' or self.student_semester != '':
+        if self.student_prog != '' and self.student_cgpa != '' and self.student_semester != '' and self.study_time_s != '' and self.study_time_e != '':
             self.signup2_check = True
             try:
                 # Convert it into float
@@ -274,8 +277,8 @@ class Scheduler(MDApp):
                         self.id = str(u_id[0])
                         self.strng.get_screen('Store').ids.user_id.text = self.id
 
-                insert_query2 = "INSERT INTO student_uni_info(stu_program, stu_CGPA, stu_sem, user_id) " \
-                                "VALUES('" + self.student_prog + "', '" + self.student_cgpa + "', " + self.student_semester + ", " + self.id + ")"
+                insert_query2 = "INSERT INTO student_uni_info(stu_program, stu_CGPA, stu_sem, study_start, study_end, user_id) " \
+                                "VALUES('" + self.student_prog + "', '" + self.student_cgpa + "', " + self.student_semester + ", '"+ self.study_time_s+"', '"+self.study_time_e+"', " + self.id + ")"
                 cur.execute(insert_query2)
                 db.commit()
 
@@ -283,7 +286,6 @@ class Scheduler(MDApp):
                 self.strng.get_screen('ProfilePage').ids.ch_user_name.text = self.user_name_signup
                 self.strng.get_screen('ProfilePage').ids.ch_user_email.text = self.user_email_signup
                 self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = self.user_password_signup
-                stu_id = self.id
                 stu_id = self.id
                 stu_sem = self.student_semester
                 self.strng.get_screen('SignUpPage2').manager.transition = NoTransition()
@@ -527,6 +529,30 @@ class Scheduler(MDApp):
     def on_okay(self, instance, time):
         self.strng.get_screen('EventScreen').ids.eve_time_end.text = str(time)
 
+        # To pick time for Event
+
+    def study_start(self):
+        self.time_dialog = MDTimePicker()
+        self.time_dialog.bind(on_cancel=self.on_can, time=self.on_s)
+        self.time_dialog.open()
+
+        # to save the time for the event
+
+    def on_s(self, instance, time):
+        self.strng.get_screen('SignUpPage2').ids.study_time_start.text = str(time)
+
+        # To pick time for Event
+
+    def study_end(self):
+        self.time_dialog = MDTimePicker()
+        self.time_dialog.bind(on_cancel=self.on_can, time=self.on_sa)
+        self.time_dialog.open()
+
+        # to save the time for the event
+
+    def on_sa(self, instance, time):
+        self.strng.get_screen('SignUpPage2').ids.study_time_end.text = str(time)
+
     # to close the time dialog box
     def on_can(self, instance, time):
         self.time_dialog.dismiss()
@@ -623,6 +649,7 @@ class Scheduler(MDApp):
                        "INNER JOIN student_subjects ON student_subjects.stu_sub_id = students_task.stu_sub_id and student_subjects.user_id="+self.id+""
         cur.execute(select_state)
         er = cur.fetchall()
+
         for i in er:
             print(i)
             x = i[2].split("-")
@@ -632,12 +659,18 @@ class Scheduler(MDApp):
             diff = diff.total_seconds()
             m, s = divmod(diff, 60)
             h, m = divmod(m, 60)
-            print(h, i[1], i[3])
             priority = (- h + (i[1] + i[3])) / 100
 
             insert_state = "UPDATE students_task SET priority = "+ str(priority) +" where task_id =" + str(i[0]) + ""
             cur.execute(insert_state)
             db.commit()
+
+            time_allot = (i[3]/10) * 2.0
+
+            insert_task_hrs = "INSERT INTO task_time_allocation(task_hrs) VALUES('"+time_allot+"') where task_id = "+i[0]+""
+            cur.execute(insert_task_hrs)
+            db.commit()
+
 
 
 
