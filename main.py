@@ -13,11 +13,15 @@ from kivy.factory import Factory
 from kivymd.uix.dialog import MDDialog
 from kivy.properties import ObjectProperty
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
+import os
 import sqlite3 as sql
 import calendar
 import datetime
 import re
+
 from pages import *
+from kivy.core.window import Window
+Window.size = (400, 650)
 
 
 db = sql.connect('D:\Documents\MIU\SPSDScheduler_FYP\scheduler.db')
@@ -31,6 +35,8 @@ cur_month = cur_date.strftime("%b")
 cur_year = cur_date.strftime("%Y")
 cur_month_num = cur_date.month
 ch_date = cur_year
+stu_id = ""
+stu_sem = ""
 
 check_change_date = False
 
@@ -54,23 +60,28 @@ class Content(BoxLayout):
     course_code = ObjectProperty(None)
     course_name = ObjectProperty(None)
     course_credit = ObjectProperty(None)
-
+    global stu_sem
+    global stu_id
     def course_details(self, instance):
 
         self.add_subject(instance)
 
     def add_subject(self, instance):
-        if self.course_name != "" and self.course_code != "" and self.course_credit != "":
-            insert_subject = "INSERT INTO student_subjects(sub_cou_code, sub_name, sub_cre_hrs," \
-                             "stu_sem, user_id) VALUES" \
-                             "('"+self.course_code+"', '" + self.course_name+"','"+self.course_credit+"','4','57')"
+
+        if self.course_name.text != "" and self.course_code.text != "" and self.course_credit.text != "":
+            insert_subject = "INSERT INTO student_subjects(sub_cou_code, sub_name, sub_cre_hrs,stu_sem, user_id) VALUES" \
+                             "('"+self.course_code.text+"', '"+self.course_name.text+"', "+self.course_credit.text+" , "+stu_sem+", "+stu_id+")"
             cur.execute(insert_subject)
             db.commit()
+           # os.mkdir(f"D:\Documents\MIU\SPSDSchedular\{self.course_name}")
 
         if instance.text == "Add_next":
             self.course_name.text = ""
             self.course_credit.text = ""
             self.course_code.text = ""
+        else:
+            self.dialog.dismiss()
+
 
 
 class ContentCustomSheet(BoxLayout):
@@ -118,6 +129,11 @@ class Scheduler(MDApp):
     # instantiate Scheduler class
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        #self.path = "/storage/emulated/0/SPSDSchedular"
+        #self.path = "D:\Documents\MIU\SPSDSchedular"
+
+        #self.access = 0o755
+        #os.mkdir(self.path, self.access)
 
     # build method to load kv file
     def build(self):
@@ -217,6 +233,7 @@ class Scheduler(MDApp):
 
     # check signup details Page2
     def check_signup2(self):
+        global stu_id, stu_sem
         self.student_prog = self.strng.get_screen('SignUpPage2').ids.stu_prog.text
         self.student_cgpa = self.strng.get_screen('SignUpPage2').ids.stu_cgpa.text
         self.student_semester = self.strng.get_screen('SignUpPage2').ids.stu_sem.text
@@ -230,7 +247,7 @@ class Scheduler(MDApp):
             except ValueError:
                 self.signup2_check = False
 
-            if not self.signup_check or self.st > 4 or self.st < 0:
+            if not self.signup_check or self.st > 4.0 or self.st < 0.0:
                 close_btn = MDFlatButton(text='Close', on_release=self.close_username_dialog)
                 self.error_dialog = MDDialog(title="Invalid CGPA", text="Enter valid CGPA (eg. 3.50)",
                                        size_hint=(0.7, 0.2),
@@ -263,7 +280,12 @@ class Scheduler(MDApp):
                 db.commit()
 
                 self.strng.get_screen('Store').ids.user_sem.text = str(self.student_semester)
-
+                self.strng.get_screen('ProfilePage').ids.ch_user_name.text = self.user_name_signup
+                self.strng.get_screen('ProfilePage').ids.ch_user_email.text = self.user_email_signup
+                self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = self.user_password_signup
+                stu_id = self.id
+                stu_id = self.id
+                stu_sem = self.student_semester
                 self.strng.get_screen('SignUpPage2').manager.transition = NoTransition()
                 self.strng.get_screen('SignUpPage3').manager.current = 'SignUpPage3'
 
@@ -290,13 +312,16 @@ class Scheduler(MDApp):
 
     # Show all pending task in Home page of the User
     def home_view(self):
-        self.query_select_events = "SELECT * from students_task"
+        self.u_id = self.strng.get_screen('Store').ids.user_id.text
+
+        self.query_select_events = "SELECT task_name, task_type, task_due_date from students_task " \
+                                   "INNER JOIN student_subjects ON student_subjects.stu_sub_id = students_task.stu_sub_id " \
+                                   "where student_subjects.user_id = "+ self.u_id +" ORDER BY priority DESC"
         cur.execute(self.query_select_events)
         self.strng.get_screen('Home').ids.view_all.clear_widgets()
         all_events = cur.fetchall()
         for all_eve in all_events:
-            if all_eve[6] == int(self.strng.get_screen('Store').ids.user_id.text):
-                self.strng.get_screen('Home').ids.view_all.add_widget(ThreeLineListItem(text=all_eve[1], secondary_text=all_eve[2]))
+            self.strng.get_screen('Home').ids.view_all.add_widget(ThreeLineListItem(text=all_eve[0], secondary_text=all_eve[2]))
 
     # Set the date for calenderPage title bar to current Date
     def calendarPage_title(self):
@@ -391,7 +416,7 @@ class Scheduler(MDApp):
 
     # To close the calender dialog box
     def on_cancel(self, instance, value):
-        self.date_dialog.close()
+        self.date_dialog.dismiss()
 
     # dropdown menu to show subjects
     def drop_subs(self):
@@ -434,10 +459,18 @@ class Scheduler(MDApp):
         self.id = self.strng.get_screen('Store').ids.user_id.text
 
         if self.task_name != "" and self.type_task !="" and self.due_date != "" and self.marks_per != "" and self.subject != "":
-            self.insert_task = "INSERT INTO students_task(task_type, task_name, sub_name, " \
-                               "task_due_date, marks_percentage,user_id) VALUES('" + self.type_task + "', '" + self.task_name + "','" + self.subject + "', '" + self.due_date + "', "+self.marks_per + ", "+self.id+")"
+            select_sub = "SELECT stu_sub_id, user_id FROM student_subjects where sub_name = '" + self.subject + "'"
+            cur.execute(select_sub)
+            sub = cur.fetchall()
+            for all in sub:
+                if all[1] == int(self.id):
+                    self.sub_code = str(all[0])
+
+            self.insert_task = "INSERT INTO students_task(task_type, task_name, " \
+                               "task_due_date, marks_percentage,stu_sub_id) VALUES('" + self.type_task + "', '" + self.task_name + "', '" + self.due_date + "', "+self.marks_per + ", "+self.sub_code+")"
             cur.execute(self.insert_task)
             db.commit()
+            self.set_priority()
             self.home_view()
             self.strng.get_screen('Home').manager.current = 'Home'
 
@@ -496,7 +529,7 @@ class Scheduler(MDApp):
 
     # to close the time dialog box
     def on_can(self, instance, time):
-        self.time_dialog.close()
+        self.time_dialog.dismiss()
 
     def calculate_gpa(self):
         self.cre_hrs = []
@@ -514,16 +547,18 @@ class Scheduler(MDApp):
         self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_4.text))
         self.gra.append(self.ch_gra(self.strng.get_screen('CgpaPage').ids.gra_5.text))
         for (i, j) in zip(self.cre_hrs, self.gra):
-            i = int(i)
-            if i != "" and i <= 4 and j != "":
-                self.multi += i * j
-                self.sum += i
+            if i != "" and int(i) <= 4 and j is not None:
+                self.multi += int(i) * j
+                self.sum += int(i)
+            elif i != "" or j is not None:
+                break
             else:
                 close_btn = MDFlatButton(text='Close', on_release=self.close_cgpa_dialog)
-                self.err_cgpa_dialog = MDDialog(title="Invalid Semester", text="Enter valid semester",
+                self.err_cgpa_dialog = MDDialog(title="Invalid Credit hrs", text="Enter valid Credit hours",
                                                 size_hint=(0.7, 0.2),
                                                 buttons=[close_btn])
                 self.err_cgpa_dialog.open()
+                break
 
         self.result = round(self.multi/self.sum, 2)
         self.strng.get_screen('CgpaPage').ids.result.text = f"CGPA is: {self.result}"
@@ -581,6 +616,30 @@ class Scheduler(MDApp):
         self.strng.get_screen('LoginPage').ids.user_pass.text = ""
         self.strng.get_screen('Store').ids.user_sem.text = ""
         self.strng.get_screen('Store').ids.user_id.text = ""
+
+    def set_priority(self):
+        self.id = self.strng.get_screen('Store').ids.user_id.text
+        select_state = "Select task_id, sub_cre_hrs, task_due_date, marks_percentage FROM students_task " \
+                       "INNER JOIN student_subjects ON student_subjects.stu_sub_id = students_task.stu_sub_id and student_subjects.user_id="+self.id+""
+        cur.execute(select_state)
+        er = cur.fetchall()
+        for i in er:
+            print(i)
+            x = i[2].split("-")
+            my_datetime = datetime.datetime(int(x[0]), int(x[1]), int(x[2]))
+            now = datetime.datetime.now()
+            diff = now - my_datetime
+            diff = diff.total_seconds()
+            m, s = divmod(diff, 60)
+            h, m = divmod(m, 60)
+            print(h, i[1], i[3])
+            priority = (- h + (i[1] + i[3])) / 100
+
+            insert_state = "UPDATE students_task SET priority = "+ str(priority) +" where task_id =" + str(i[0]) + ""
+            cur.execute(insert_state)
+            db.commit()
+
+
 
 Scheduler().run()
 

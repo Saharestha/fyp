@@ -22,7 +22,7 @@ class Home(Screen):
 
 
 class CalendarPage(Screen):
-    passs
+    pass
 
 
 class ProfilePage(Screen):
