@@ -260,7 +260,8 @@ ScreenManager:
             MDTextField:
                 id: study_time_start
                 text: ""
-                hint_text: "From"
+                hint_text: "Start time"
+                helper_text: "Time to start your work"
                 pos_hint: {"center_x": 0.5}
                 color_mode:'custom'
                 current_hint_text_color: app.theme_cls.accent_color
@@ -269,14 +270,14 @@ ScreenManager:
 
 
             MDTextField:
-                id: study_time_end
+                id: no_of_tasks
                 text: ""
                 hint_text: "To"
                 pos_hint: {"center_x": 0.5}
                 color_mode:'custom'
                 current_hint_text_color: app.theme_cls.accent_color
                 line_color_focus: app.theme_cls.accent_color
-                on_focus: if self.focus: app.study_end()
+
 
 
         BoxLayout:
@@ -1123,13 +1124,6 @@ ScreenManager:
                     Widget:
 
 
-
-
-
-
-
-
-
 <Store>
     name: "Store"
     MDLabel:
@@ -1138,4 +1132,8 @@ ScreenManager:
 
     MDLabel:
         id: user_sem
+        text: ""
+
+    MDLabel:
+        id: date_ch
         text: ""
