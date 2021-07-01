@@ -164,7 +164,7 @@ class Scheduler(MDApp):
                         self.strng.get_screen('Store').ids.user_id.text = str(user_info[0])
                         self.strng.get_screen('ProfilePage').ids.ch_user_name.text = str(user_info[1])
                         self.strng.get_screen('ProfilePage').ids.ch_user_email.text = str(user_info[2])
-                        self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = str(user_info[3])
+                        self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = "********"
                         self.home_view()
                         self.strng.get_screen('Home').manager.current = 'Home'
                         break
@@ -284,7 +284,7 @@ class Scheduler(MDApp):
                 self.strng.get_screen('Store').ids.user_sem.text = str(self.student_semester)
                 self.strng.get_screen('ProfilePage').ids.ch_user_name.text = self.user_name_signup
                 self.strng.get_screen('ProfilePage').ids.ch_user_email.text = self.user_email_signup
-                self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = self.user_password_signup
+                self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = "********"
                 stu_id = self.id
                 stu_sem = self.student_semester
                 self.strng.get_screen('SignUpPage2').manager.transition = NoTransition()
