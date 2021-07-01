@@ -2,7 +2,6 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.list import ThreeLineListItem
 from kivymd.uix.picker import MDDatePicker, MDTimePicker
-from kivymd.uix.textfield import MDTextField
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.metrics import dp
@@ -40,21 +39,6 @@ stu_id = ""
 stu_sem = ""
 
 check_change_date = False
-
-
-class CourseGra(MDTextField):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class CourseCreHrs(MDTextField):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
-class CurrentGp(MDDialog):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
 
 class Content(BoxLayout):
@@ -151,8 +135,9 @@ class Scheduler(MDApp):
 
     # build method to load kv file
     def build(self):
-        self.theme_cls.primary_palette = "Blue"
-        self.theme_cls.accent_palette = "Indigo"
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "DeepOrange"
+        self.theme_cls.accent_palette = "LightBlue"
         self.strng = Builder.load_file("sch_kv.kv")
         return self.strng
 
@@ -188,7 +173,7 @@ class Scheduler(MDApp):
                         self.strng.get_screen('LoginPage').ids.error_text.text = "User Doesn't exist"
                         self.strng.get_screen('LoginPage').ids.error_text.height = "3dp"
 
-                    elif not user_info[3] != self.user_pass_login:
+                    elif user_info[3] != self.user_pass_login:
                         self.strng.get_screen('LoginPage').ids.error_text.text = "Incorrect email or password"
                         self.strng.get_screen('LoginPage').ids.error_text.height = "3dp"
 
@@ -328,16 +313,30 @@ class Scheduler(MDApp):
     # Show all pending task in Home page of the User
     def home_view(self):
         self.u_id = self.strng.get_screen('Store').ids.user_id.text
+        self.query_no_tasks = "SELECT no_of_tasks from student_uni_info where user_id = "+self.u_id+""
+        cur.execute(self.query_no_tasks)
+        self.no_tasks = cur.fetchall()
+        self.query_select_events = "Select students_task.task_name, student_subjects.sub_name, task_time_allocation.task_start, " \
+                                   "task_time_allocation.task_end, students_task.task_due_date  FROM students_task, student_subjects, " \
+                                   "task_time_allocation where student_subjects.stu_sub_id = students_task.stu_sub_id and students_task.task_id = " \
+                                   "task_time_allocation.task_id and user_id = "+self.u_id+" ORDER BY students_task.priority ASC LIMIT "+str(self.no_tasks[0][0])+""
 
-        self.query_select_events = "SELECT task_name, task_type, task_due_date from students_task " \
-                                   "INNER JOIN student_subjects ON student_subjects.stu_sub_id = students_task.stu_sub_id " \
-                                   "where student_subjects.user_id = " + self.u_id + " ORDER BY priority ASC"
         cur.execute(self.query_select_events)
         self.strng.get_screen('Home').ids.view_all.clear_widgets()
         all_events = cur.fetchall()
         for all_eve in all_events:
+            self.text1 = all_eve[0]+" - "+all_eve[1]
+            self.text2 = all_eve[2] + " - " + all_eve[3]
+            self.text3 = "Due Date: " + all_eve[4]
             self.strng.get_screen('Home').ids.view_all.add_widget(
-                ThreeLineListItem(text=all_eve[0], secondary_text=all_eve[2]))
+                ThreeLineListItem(text=self.text1, secondary_text=self.text2, tertiary_text=self.text3, on_release=self.details))
+
+    def details(self, obj):
+        self.strng.get_screen("DetailsPage").ids.title.text = obj.text
+        self.strng.get_screen("DetailsPage").ids.time_t.text = obj.secondary_text
+        self.strng.get_screen("DetailsPage").ids.due_d.text = obj.tertiary_text
+        self.strng.get_screen("DetailsPage").manager.current = "DetailsPage"
+
 
     # Set the date for calenderPage title bar to current Date
     def calendarPage_title(self):
@@ -350,43 +349,75 @@ class Scheduler(MDApp):
     # To create calendar in Calendar Page
     def create_calendar(self, instance):
         self.date = ""
+        self.sel_month = ""
+        self.sel_year = ""
         if instance.text == "Calendar":
             self.c = calendar.monthcalendar(int(cur_year), int(cur_month_num))
+            self.sel_year = cur_year
+            self.sel_month = cur_month_num
         else:
             for m in months:
                 if instance.text == m:
                     self.date = months.index(m) + 1
+            self.sel_year = ch_date
+            self.sel_month = self.date
             self.c = calendar.monthcalendar(int(ch_date), self.date)
+
         self.strng.get_screen('CalendarPage').ids.calendar_space.clear_widgets()
         for i in self.c:
             for j in i:
                 if j == 0:
+                    btn = Button(on_release=self.on_release,
+                                 text='{j}'.format(j=''))
                     self.strng.get_screen("CalendarPage").ids.calendar_space.add_widget(
-                        Button(on_release=self.on_release,
-                               text='{j}'.format(j='')))
+                        btn)
+                    btn.bind(on_release=lambda instance: self.on_release(instance, self.sel_year, self.sel_month))
                 else:
+                    btn = Button(on_release=self.on_release,
+                               text='{j}'.format(j=j))
                     self.strng.get_screen("CalendarPage").ids.calendar_space.add_widget(
-                        Button(on_release=self.on_release,
-                               text='{j}'.format(j=j)))
+                        btn)
+                    btn.bind(on_release=lambda instance: self.on_release(instance, self.sel_year, self.sel_month))
 
     # Go from calender page to Home Screen
     def close_page(self):
         self.strng.get_screen('Home').manager.current = "Home"
 
-    # To open an overlay to view the events/tasks for the day
-    def on_release(self, obj):
-        pass
+    # Go from details page to Calendar Screen
+    def close_page2(self):
+        self.strng.get_screen('CalendarPage').manager.current = "CalendarPage"
 
-    #    if not self.dialog2:
-    #        self.dialog2 = MDDialog(
-    #            title="Events for the Day:",
-    #            type="custom",
-    #            size_hint_x=None,
-    #            width="300dp",
-    #            content_cls= SeeEvents(),
-    #        )
-    #    self.dialog2.open()
-    #    SeeEvents().show_all()
+    # To open an overlay to view the events/tasks for the day
+    def on_release(self, obj, year, month):
+
+        self.day = obj.text
+        if self.day == "":
+            self.day = "0"
+        if int(self.day) < 10:
+            self.day = "0" + self.day
+        if month < 10:
+            month = "0" + str(month)
+        self.t_date = str(year) + "-" + str(month)+ "-" + self.day
+
+
+
+        if self.day != "00":
+
+            select_all_tasks = "SELECT * FROM student_events " \
+                               "where user_id = " + self.strng.get_screen("Store").ids.user_id.text + " and event_date = '"+self.t_date+"'"
+            cur.execute(select_all_tasks)
+            event_date = cur.fetchall()
+            for eve in event_date:
+
+                self.time_e = eve[3] + " - " + eve[4]
+                self.strng.get_screen('AllTasksPage').ids.day_task.add_widget\
+                    (ThreeLineListItem(text=eve[1], secondary_text =self.time_e))
+
+            self.strng.get_screen('AllTasksPage').ids.sele_date.text = "Date: " + self.t_date
+            self.strng.get_screen('AllTasksPage').manager.transition = NoTransition()
+            self.strng.get_screen('AllTasksPage').manager.current = "AllTasksPage"
+        return year, month
+
 
     # Show bottom nav in Calendar page
     def select_calendar(self):
@@ -659,8 +690,10 @@ class Scheduler(MDApp):
 
     def set_priority(self):
         self.id = self.strng.get_screen('Store').ids.user_id.text
-        select_state = "Select task_id, sub_cre_hrs, task_due_date, marks_percentage FROM students_task " \
-                       "INNER JOIN student_subjects ON student_subjects.stu_sub_id = students_task.stu_sub_id and student_subjects.user_id=" + self.id + ""
+        select_state = "Select students_task.task_id, student_subjects.sub_cre_hrs, students_task.task_due_date, students_task.marks_percentage " \
+                       "FROM students_task, student_subjects " \
+                       "WHERE student_subjects.stu_sub_id = students_task.stu_sub_id " \
+                       "and student_subjects.user_id=" + self.id + ""
         cur.execute(select_state)
         er = cur.fetchall()
 
@@ -687,8 +720,8 @@ class Scheduler(MDApp):
         self.study_start_time = task_data[0][0]
         self.no_of_tasks = str(task_data[0][1])
         self.data_ch = False
-        select_pri = "Select task_id, priority, marks_percentage FROM students_task " \
-                     "INNER JOIN student_subjects ON student_subjects.stu_sub_id = students_task.stu_sub_id and " \
+        select_pri = "Select students_task.task_id, students_task.priority, students_task.marks_percentage FROM students_task, " \
+                     "student_subjects WHERE student_subjects.stu_sub_id = students_task.stu_sub_id and " \
                      "student_subjects.user_id="+s_id+" ORDER BY priority ASC LIMIT "+self.no_of_tasks+""
         cur.execute(select_pri)
         final = cur.fetchall()
@@ -703,23 +736,27 @@ class Scheduler(MDApp):
         for fi in final:
             time_allot = (fi[2] / 10) * 2.0
             print(self.data_ch)
-            insert_task_hrs = "INSERT INTO task_time_allocation(task_hrs, task_id) VALUES(" + str(
-                time_allot) + ", " + str(fi[0]) + ")"
-            print("yup")
-            cur.execute(insert_task_hrs)
-            db.commit()
+            for t in final2:
+                if t[4] == fi[0]:
+                    self.data_ch = True
+
+            if not self.data_ch:
+                insert_task_hrs = "INSERT INTO task_time_allocation(task_hrs, task_id) VALUES(" + str(
+                    time_allot) + ", " + str(fi[0]) + ")"
+                print("yup")
+                cur.execute(insert_task_hrs)
+                db.commit()
 
             self.task_start = datetime.datetime.strptime(self.study_start_time, '%H:%M:%S')
             self.task_end = self.task_start + timedelta(hours=time_allot)
             self.study_start_time = datetime.datetime.strftime(self.task_end, '%H:%M:%S')
 
-            insert_task_time = "UPDATE task_time_allocation set task_start = '"+str(self.task_start.time())+"', task_end = '"+str(self.task_end.time())+"' where task_id = "+str(fi[0])+""
+            insert_task_time = "UPDATE task_time_allocation set task_start = " \
+                               "'"+str(self.task_start.time())+"', task_end = '"+str(self.task_end.time())+"' where task_id = "+str(fi[0])+""
             print(insert_task_time)
             cur.execute(insert_task_time)
             db.commit()
-
-
-
+            self.data_ch= False
 
 
 

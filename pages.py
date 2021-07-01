@@ -41,6 +41,14 @@ class CgpaPage(Screen):
     pass
 
 
+class DetailsPage(Screen):
+    pass
+
+
+class AllTasksPage(Screen):
+    pass
+
+
 class Store(Screen):
     pass
 
@@ -58,4 +66,6 @@ sm.add_widget(ProfilePage(name="ProfilePage"))
 sm.add_widget(TaskScreen(name="TaskScreen"))
 sm.add_widget(EventScreen(name="EventScreen"))
 sm.add_widget(CgpaPage(name="CgpaPage"))
+sm.add_widget(DetailsPage(name="DetailsPage"))
+sm.add_widget(AllTasksPage(name="AllTasksPage"))
 sm.add_widget(Store(name="Store"))

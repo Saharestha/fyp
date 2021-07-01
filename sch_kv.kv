@@ -10,6 +10,8 @@ ScreenManager:
     EventScreen:
     TaskScreen:
     CgpaPage:
+    DetailsPage:
+    AllTasksPage:
     Store:
 
 <LoginPage>
@@ -22,13 +24,8 @@ ScreenManager:
         padding: 25
         spacing:25
 
-        MDLabel:
-            text: "SPSD Scheduler"
-            theme_text_color: "Custom"
-            text_color: 0, 0, 0, 0.75
-            font_size: 40
-            halign: 'center'
-            size_hint_y: None
+        Image:
+            source: "Logo.jpeg"
 
         MDLabel:
             id: error_text
@@ -45,8 +42,10 @@ ScreenManager:
             hint_text: "Email"
             icon_right: "account"
             size_hint_x: None
-            width: 200
+            width: 300
             font_size: 18
+            mode: "fill"
+            fill_color: 1, 240/255, 230/255, 0.1
             color_mode:'custom'
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
@@ -60,7 +59,9 @@ ScreenManager:
             hint_text: "Password"
             icon_right: "key-variant"
             size_hint_x: None
-            width: 200
+            width: 300
+            mode: "fill"
+            fill_color: 1, 240/255, 230/255, 0.1
             color_mode:'custom'
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
@@ -112,6 +113,8 @@ ScreenManager:
             theme_text_color: "Custom"
             text_color: 0, 0, 0, 0.75
             font_size: 25
+            theme_text_color: "Custom"
+            text_color: 1,99/255,71/255, 1
             halign: 'center'
             size_hint_y: None
 
@@ -121,6 +124,7 @@ ScreenManager:
             theme_text_color: "Custom"
             text_color: 1, 0, 0, 0.75
             font_size: 13
+
             halign: 'center'
             size_hint_y: None
             height: '0dp'
@@ -272,7 +276,7 @@ ScreenManager:
             MDTextField:
                 id: no_of_tasks
                 text: ""
-                hint_text: "To"
+                hint_text: "No. of Tasks"
                 pos_hint: {"center_x": 0.5}
                 color_mode:'custom'
                 current_hint_text_color: app.theme_cls.accent_color
@@ -321,13 +325,6 @@ ScreenManager:
             on_release: app.add_subject_dialog()
 
         BoxLayout:
-            MDFlatButton:
-                text: "Go Back"
-                text_color: self.theme_cls.primary_color
-                on_release:
-                    root.manager.current = "SignUpPage"
-                    root.manager.transition.direction = "right"
-
             MDFlatButton:
                 text: "OK"
                 text_color: self.theme_cls.primary_color
@@ -404,10 +401,19 @@ ScreenManager:
                     Widget:
                         size_hint_y: None
                         height:0
+                    BoxLayout:
+                        orientation: 'vertical'
+                        MDLabel:
+                            text:"Tasks for the day"
+                            size_hint_y: 0.2
 
-                    ScrollView:
-                        MDList:
-                            id: view_all
+                        MDSeparator:
+                            height: "1dp"
+
+                        ScrollView:
+                            MDList:
+                                id: view_all
+
 
                 MDFloatingActionButtonSpeedDial:
                     data: app.data
@@ -447,7 +453,7 @@ ScreenManager:
                                 icon: 'account-settings'
 
                         OneLineIconListItem:
-                            text: 'CGPA Calculator'
+                            text: 'GPA Calculator'
                             on_release:
                                 root.manager.current = "CgpaPage"
                             IconLeftWidget:
@@ -557,7 +563,6 @@ ScreenManager:
                 color_mode:'custom'
                 current_hint_text_color: app.theme_cls.accent_color
                 line_color_focus: app.theme_cls.accent_color
-                required: True
                 pos_hint: {"center_x": 0.5}
                 size_hint_x: None
                 width: 190
@@ -836,6 +841,37 @@ ScreenManager:
             text: "Dec"
             on_press: app.go_back(self)
 
+<AllTasksPage>
+    name: "AllTasksPage"
+    MDNavigationLayout:
+    ScreenManager:
+        Screen:
+            BoxLayout:
+                orientation: 'vertical'
+                MDToolbar:
+                    id: cal_tool
+                    title: ""
+                    elevation:10
+                    left_action_items: [['close', lambda x : app.close_page2()]]
+                MDLabel:
+                    text: "Tasks for the day"
+                    font_size: 25
+                    theme_text_color: "Custom"
+                    text_color: 1,99/255,71/255, 1
+                    halign: 'center'
+                    size_hint_y: None
+
+                MDLabel:
+                    id: sele_date
+                    text: ""
+                    halign: 'center'
+                    size_hint_y: None
+                ScrollView:
+                    MDList:
+                        id: day_task
+
+                Widget:
+
 <ProfilePage>
     name: "ProfilePage"
     MDNavigationLayout:
@@ -937,10 +973,15 @@ ScreenManager:
                     orientation: "vertical"
                     pos_hint: {"center_x": 0.5, "center_y":0.5}
                     MDToolbar:
-                        title: 'CGPA Calculator'
+                        title: 'GPA Calculator'
                         elevation:10
                         left_action_items: [['close', lambda x : app.close_page()]]
 
+                    MDLabel:
+                        text: ""
+                        theme_text_color: "Custom"
+                        text_color: 1,99/255,71/255, 1
+                        halign: 'right'
 
                     MDLabel:
                         text: "Enter your estimated grades!!"
@@ -1109,7 +1150,7 @@ ScreenManager:
 
                     MDLabel:
                         id: result
-                        text: "CGPA is: "
+                        text: "GPA is: "
                         size_hint: None, None
                         pos_hint: {"center_x": 0.5, "center_y": 0.9}
 
@@ -1120,6 +1161,53 @@ ScreenManager:
                         size_hint: None, None
                         on_release:
                             app.calculate_gpa()
+
+                    Widget:
+
+
+<DetailsPage>
+    name: "DetailsPage"
+    MDNavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        id: cal_tool
+                        title: ""
+                        elevation:10
+                        left_action_items: [['close', lambda x : app.close_page()]]
+                    MDLabel:
+                        text: "Details of the Task"
+                        font_size: 25
+                        theme_text_color: "Custom"
+                        text_color: 1,99/255,71/255, 1
+                        halign: 'center'
+                        size_hint_y: None
+                    BoxLayout:
+                        orientation: "vertical"
+
+                        MDLabel:
+                            id: title
+                            text: ""
+                        MDLabel:
+                            id: time_t
+                            text: ""
+                        MDLabel:
+                            id: due_d
+                            text: ""
+                    BoxLayout:
+                        orientation: "vertical"
+                        MDLabel:
+                            text: "References"
+                            theme_text_color: "Custom"
+                            text_color: 1,99/255,71/255, 1
+                            halign: 'center'
+                        ScrollView:
+                            MDList:
+                                id: references
+                                OneLineListItem:
+                                    text: "okay"
 
                     Widget:
 
@@ -1137,3 +1225,4 @@ ScreenManager:
     MDLabel:
         id: date_ch
         text: ""
+
