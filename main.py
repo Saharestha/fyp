@@ -165,6 +165,7 @@ class Scheduler(MDApp):
                         self.strng.get_screen('ProfilePage').ids.ch_user_name.text = str(user_info[1])
                         self.strng.get_screen('ProfilePage').ids.ch_user_email.text = str(user_info[2])
                         self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = "********"
+                        self.allot_time()
                         self.home_view()
                         self.strng.get_screen('Home').manager.current = 'Home'
                         break
@@ -317,7 +318,7 @@ class Scheduler(MDApp):
         cur.execute(self.query_no_tasks)
         self.no_tasks = cur.fetchall()
         self.query_select_events = "Select students_task.task_name, student_subjects.sub_name, task_time_allocation.task_start, " \
-                                   "task_time_allocation.task_end, students_task.task_due_date  FROM students_task, student_subjects, " \
+                                   "task_time_allocation.task_end, students_task.task_due_date FROM students_task, student_subjects, " \
                                    "task_time_allocation where student_subjects.stu_sub_id = students_task.stu_sub_id and students_task.task_id = " \
                                    "task_time_allocation.task_id and user_id = "+self.u_id+" ORDER BY students_task.priority ASC LIMIT "+str(self.no_tasks[0][0])+""
 
@@ -336,6 +337,28 @@ class Scheduler(MDApp):
         self.strng.get_screen("DetailsPage").ids.time_t.text = obj.secondary_text
         self.strng.get_screen("DetailsPage").ids.due_d.text = obj.tertiary_text
         self.strng.get_screen("DetailsPage").manager.current = "DetailsPage"
+
+    # delete task
+    def delete_task(self, instance):
+        self.task_title = self.strng.get_screen("DetailsPage").ids.title.text
+        self.task_time = self.strng.get_screen("DetailsPage").ids.time_t.text
+        self.due_date = self.strng.get_screen("DetailsPage").ids.due_d.text
+        self.task_title = self.task_title.split('-')
+        self.task_time = self.task_time.split(' - ')
+        self.due_date = self.due_date.split('-')
+        select_task_id = "SELECT task_id from task_time_allocation where task_start = '"+ self.task_time[0] +"' and task_end = '"+ self.task_time[1] +"'"
+        cur.execute(select_task_id)
+        self.task_ids = cur.fetchall()
+        self.task_id = str(self.task_ids[0][0])
+        delete_query = "Delete from task_time_allocation where task_id = " + self.task_id + ""
+        cur.execute(delete_query)
+        db.commit()
+        delete_query2 = "Delete from students_task where task_id = " + self.task_id + ""
+        cur.execute(delete_query2)
+        db.commit()
+        self.allot_time()
+        self.home_view()
+
 
 
     # Set the date for calenderPage title bar to current Date
@@ -389,7 +412,7 @@ class Scheduler(MDApp):
 
     # To open an overlay to view the events/tasks for the day
     def on_release(self, obj, year, month):
-
+        self.strng.get_screen('AllTasksPage').ids.day_task.clear_widgets()
         self.day = obj.text
         if self.day == "":
             self.day = "0"
@@ -401,14 +424,14 @@ class Scheduler(MDApp):
 
 
 
-        if self.day != "00":
 
+        if self.day != "00":
+            self.user_id = self.strng.get_screen("Store").ids.user_id.text
             select_all_tasks = "SELECT * FROM student_events " \
-                               "where user_id = " + self.strng.get_screen("Store").ids.user_id.text + " and event_date = '"+self.t_date+"'"
+                               "where user_id = " + self.user_id+ " and event_date = '"+self.t_date+"'"
             cur.execute(select_all_tasks)
             event_date = cur.fetchall()
             for eve in event_date:
-
                 self.time_e = eve[3] + " - " + eve[4]
                 self.strng.get_screen('AllTasksPage').ids.day_task.add_widget\
                     (ThreeLineListItem(text=eve[1], secondary_text =self.time_e))
@@ -688,6 +711,8 @@ class Scheduler(MDApp):
         self.strng.get_screen('Store').ids.user_sem.text = ""
         self.strng.get_screen('Store').ids.user_id.text = ""
 
+
+
     def set_priority(self):
         self.id = self.strng.get_screen('Store').ids.user_id.text
         select_state = "Select students_task.task_id, student_subjects.sub_cre_hrs, students_task.task_due_date, students_task.marks_percentage " \
@@ -711,56 +736,54 @@ class Scheduler(MDApp):
             cur.execute(insert_state)
             db.commit()
 
-        self.allot_time(self.id)
+        self.allot_time()
 
-    def allot_time(self, s_id):
+    def allot_time(self):
+        s_id = self.strng.get_screen('Store').ids.user_id.text
         select_uni = "SELECT study_start, no_of_tasks FROM student_uni_info WHERE user_id =" + s_id + " "
         cur.execute(select_uni)
         task_data = cur.fetchall()
+
         self.study_start_time = task_data[0][0]
         self.no_of_tasks = str(task_data[0][1])
+        self.cur_time = datetime.datetime.now().time()
         self.data_ch = False
-        select_pri = "Select students_task.task_id, students_task.priority, students_task.marks_percentage FROM students_task, " \
-                     "student_subjects WHERE student_subjects.stu_sub_id = students_task.stu_sub_id and " \
-                     "student_subjects.user_id="+s_id+" ORDER BY priority ASC LIMIT "+self.no_of_tasks+""
-        cur.execute(select_pri)
-        final = cur.fetchall()
-        now = datetime.datetime.now()
-        current_time = now.strftime("%H:%M:%S")
+        if str(self.cur_time) < self.study_start_time:
+            select_pri = "Select students_task.task_id, students_task.priority, students_task.marks_percentage FROM students_task, " \
+                         "student_subjects WHERE student_subjects.stu_sub_id = students_task.stu_sub_id and " \
+                         "student_subjects.user_id="+s_id+" ORDER BY priority ASC LIMIT "+self.no_of_tasks+""
+            cur.execute(select_pri)
+            final = cur.fetchall()
+            now = datetime.datetime.now()
+            current_time = now.strftime("%H:%M:%S")
 
-        select_all = "SELECT * from task_time_allocation"
-        cur.execute(select_all)
-        final2 = cur.fetchall()
+            select_all = "SELECT * from task_time_allocation"
+            cur.execute(select_all)
+            final2 = cur.fetchall()
 
+            for fi in final:
+                time_allot = (fi[2] / 10) * 2.0
+                for t in final2:
+                    if t[4] == fi[0]:
+                        self.data_ch = True
 
-        for fi in final:
-            time_allot = (fi[2] / 10) * 2.0
-            print(self.data_ch)
-            for t in final2:
-                if t[4] == fi[0]:
-                    self.data_ch = True
+                if not self.data_ch:
+                    insert_task_hrs = "INSERT INTO task_time_allocation(task_hrs, task_id) VALUES(" + str(
+                        time_allot) + ", " + str(fi[0]) + ")"
+                    cur.execute(insert_task_hrs)
+                    db.commit()
 
-            if not self.data_ch:
-                insert_task_hrs = "INSERT INTO task_time_allocation(task_hrs, task_id) VALUES(" + str(
-                    time_allot) + ", " + str(fi[0]) + ")"
-                print("yup")
-                cur.execute(insert_task_hrs)
+                self.task_start = datetime.datetime.strptime(self.study_start_time, '%H:%M:%S')
+                self.task_end = self.task_start + timedelta(hours=time_allot)
+                self.study_start_time = datetime.datetime.strftime(self.task_end, '%H:%M:%S')
+
+                insert_task_time = "UPDATE task_time_allocation set task_start = " \
+                                   "'"+str(self.task_start.time())+"', task_end = '"+str(self.task_end.time())+"' where task_id = "+str(fi[0])+""
+
+                cur.execute(insert_task_time)
                 db.commit()
-
-            self.task_start = datetime.datetime.strptime(self.study_start_time, '%H:%M:%S')
-            self.task_end = self.task_start + timedelta(hours=time_allot)
-            self.study_start_time = datetime.datetime.strftime(self.task_end, '%H:%M:%S')
-
-            insert_task_time = "UPDATE task_time_allocation set task_start = " \
-                               "'"+str(self.task_start.time())+"', task_end = '"+str(self.task_end.time())+"' where task_id = "+str(fi[0])+""
-            print(insert_task_time)
-            cur.execute(insert_task_time)
-            db.commit()
-            self.data_ch= False
-
-
-
-
+                self.data_ch= False
 
 
 Scheduler().run()
+

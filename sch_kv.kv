@@ -424,15 +424,20 @@ ScreenManager:
             id: nav_drawer
             BoxLayout:
                 orientation: 'vertical'
-                spacing: '100dp'
+                spacing: '8dp'
                 padding: '8dp'
 
-
+                Image:
+                    source: "Toolbar_image.jpg"
+                    padding: '10dp'
                 MDLabel:
                     text: 'SPSD Task Scheduler'
-                    font_style: 'H5'
+                    theme_text_color: "Custom"
+                    text_color: 1,99/255,71/255, 1
+                    font_style: 'Subtitle1'
                     size_hint_y: None
-                    height: self.texture_size[1]
+                    height: 30
+                    halign: 'center'
 
                 ScrollView:
                     MDList:
@@ -466,6 +471,7 @@ ScreenManager:
                                 root.manager.current = "LoginPage"
                             IconLeftWidget:
                                 icon: 'logout'
+
 
 <TaskScreen>
     name: "TaskScreen"
@@ -854,7 +860,7 @@ ScreenManager:
                     elevation:10
                     left_action_items: [['close', lambda x : app.close_page2()]]
                 MDLabel:
-                    text: "Tasks for the day"
+                    text: "Events for the day"
                     font_size: 25
                     theme_text_color: "Custom"
                     text_color: 1,99/255,71/255, 1
@@ -977,11 +983,6 @@ ScreenManager:
                         elevation:10
                         left_action_items: [['close', lambda x : app.close_page()]]
 
-                    MDLabel:
-                        text: ""
-                        theme_text_color: "Custom"
-                        text_color: 1,99/255,71/255, 1
-                        halign: 'right'
 
                     MDLabel:
                         text: "Enter your estimated grades!!"
@@ -1209,6 +1210,18 @@ ScreenManager:
                                 OneLineListItem:
                                     text: "okay"
 
+                    GridLayout:
+                        cols: 2
+                        size_hint_x: None
+                        width: 250
+                        pos_hint: {"center_x": 0.5}
+                        spacing: [30, 0]
+                        MDRectangleFlatButton:
+                            text: "Task ready to Submit"
+                            on_release:
+                                app.delete_task(self)
+                                root.manager.transition = NoTransition()
+                                root.manager.current = "Home"
                     Widget:
 
 
