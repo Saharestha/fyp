@@ -164,7 +164,7 @@ class Scheduler(MDApp):
                         self.strng.get_screen('Store').ids.user_id.text = str(user_info[0])
                         self.strng.get_screen('ProfilePage').ids.ch_user_name.text = str(user_info[1])
                         self.strng.get_screen('ProfilePage').ids.ch_user_email.text = str(user_info[2])
-                        self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = "********"
+                        self.strng.get_screen('ProfilePage').ids.ch_user_pass.text = "*********"
                         self.allot_time()
                         self.home_view()
                         self.strng.get_screen('Home').manager.current = 'Home'
