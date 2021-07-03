@@ -18,11 +18,10 @@ ScreenManager:
     name: "LoginPage"
     MDBoxLayout:
         size_hint: None, None
-        size: 400, 500
+        size: dp(400), dp(500)
         pos_hint:{"center_x": 0.5, "center_y": 0.5}
         orientation: "vertical"
-        padding: 25
-        spacing:25
+        spacing:dp(25)
 
         Image:
             source: "Logo.jpeg"
@@ -32,18 +31,18 @@ ScreenManager:
             text: ""
             theme_text_color: "Custom"
             text_color: 1, 0, 0, 0.75
-            font_size: 15
+            font_size: dp(15)
             halign: 'center'
             size_hint_y: None
-            height: '0dp'
+            height: dp(0)
 
         MDTextField:
             id: user_email
             hint_text: "Email"
             icon_right: "account"
             size_hint_x: None
-            width: 300
-            font_size: 18
+            width: dp(300)
+            font_size: dp(18)
             mode: "fill"
             fill_color: 1, 240/255, 230/255, 0.1
             color_mode:'custom'
@@ -59,13 +58,13 @@ ScreenManager:
             hint_text: "Password"
             icon_right: "key-variant"
             size_hint_x: None
-            width: 300
+            width: dp(300)
             mode: "fill"
             fill_color: 1, 240/255, 230/255, 0.1
             color_mode:'custom'
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
-            font_size: 18
+            font_size: dp(18)
             pos_hint: {"center_x": 0.5}
             helper_text: "Required"
             helper_text_mode: 'on_error'
@@ -76,24 +75,24 @@ ScreenManager:
         MDRectangleFlatButton:
             id: login_button
             text: "Log In"
-            font_size: 15
+            font_size: dp(15)
             pos_hint: {"center_x": 0.5}
             on_release:
                 app.check_login_username()
 
 
         MDSeparator:
-            height: "1dp"
+            height: dp(1)
 
         MDLabel:
             text: "If you don't have an account"
-            font_size: 12
+            font_size: dp(12)
             halign: 'center'
 
 
         MDTextButton:
             text: "SignUp"
-            font_size: 12
+            font_size: dp(12)
             pos_hint: {"center_x": 0.5}
             on_release: root.manager.current = "SignUpPage"
 
@@ -102,17 +101,17 @@ ScreenManager:
 
     MDBoxLayout:
         size_hint: None, None
-        size: 400, 500
+        size: dp(400), dp(500)
         pos_hint:{"center_x": 0.5, "center_y": 0.5}
         orientation: "vertical"
-        padding: 45
-        spacing:15
+        padding: dp(45)
+        spacing: dp(15)
 
         MDLabel:
             text: "Sign Up"
             theme_text_color: "Custom"
             text_color: 0, 0, 0, 0.75
-            font_size: 25
+            font_size: dp(25)
             theme_text_color: "Custom"
             text_color: 1,99/255,71/255, 1
             halign: 'center'
@@ -123,14 +122,14 @@ ScreenManager:
             text: ""
             theme_text_color: "Custom"
             text_color: 1, 0, 0, 0.75
-            font_size: 13
+            font_size: dp(13)
 
             halign: 'center'
             size_hint_y: None
-            height: '0dp'
+            height: dp(0)
 
         MDSeparator:
-            height: "1dp"
+            height: dp(1)
 
         MDTextField:
             id: sign_username
@@ -142,7 +141,7 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
             required: True
 
@@ -156,7 +155,7 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
             required: True
 
@@ -170,7 +169,7 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
             password: True
             required: True
@@ -185,19 +184,19 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
             password: True
             required: True
         MDRectangleFlatButton:
             text: "SignUp"
-            font_size: 15
+            font_size: dp(15)
             pos_hint: {"center_x": 0.5}
             on_release: app.check_signup_page()
 
         MDFlatButton:
             text: "Already have an account?"
-            font_size: 10
+            font_size: dp(10)
             pos_hint: {"center_x": 0.5}
             on_release: root.manager.current = "LoginPage"
 
@@ -209,11 +208,11 @@ ScreenManager:
     name: "SignUpPage2"
     MDBoxLayout:
         size_hint: None, None
-        size: 400, 500
+        size: dp(400), dp(500)
         pos_hint:{"center_x": 0.5, "center_y": 0.5}
         orientation: "vertical"
-        padding: 45
-        spacing:15
+        padding: dp(45)
+        spacing:dp(15)
 
 
         MDLabel:
@@ -258,9 +257,9 @@ ScreenManager:
         GridLayout:
             cols: 2
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
-            spacing: [30, 0]
+            spacing: [dp(30), dp(0)]
             MDTextField:
                 id: study_time_start
                 text: ""
@@ -286,7 +285,7 @@ ScreenManager:
 
         BoxLayout:
             size_hint_y: None
-            height: 100
+            height: dp(100)
             MDFlatButton:
                 text: "Go Back"
                 text_color: self.theme_cls.primary_color
@@ -307,11 +306,11 @@ ScreenManager:
     name: "SignUpPage3"
     MDBoxLayout:
         size_hint: None, None
-        size: 400, 500
+        size: dp(400), dp(500)
         pos_hint:{"center_x": 0.5, "center_y": 0.5}
         orientation: "vertical"
-        padding: 45
-        spacing:15
+        padding: dp(45)
+        spacing:dp(15)
 
         MDLabel:
             text: "You have been registered"
@@ -340,9 +339,9 @@ ScreenManager:
 
 <Content>
     orientation: "vertical"
-    spacing: "20dp"
+    spacing: dp(20)
     size_hint_y: None
-    height: "250dp"
+    height: dp(250)
     course_code: course_code
     course_name: course_name
     course_credit: course_credit
@@ -424,19 +423,19 @@ ScreenManager:
             id: nav_drawer
             BoxLayout:
                 orientation: 'vertical'
-                spacing: '8dp'
-                padding: '8dp'
+                spacing: dp(8)
+                padding: dp(8)
 
                 Image:
                     source: "Toolbar_image.jpg"
-                    padding: '10dp'
+                    padding: dp(10)
                 MDLabel:
                     text: 'SPSD Task Scheduler'
                     theme_text_color: "Custom"
                     text_color: 1,99/255,71/255, 1
                     font_style: 'Subtitle1'
                     size_hint_y: None
-                    height: 30
+                    height: dp(30)
                     halign: 'center'
 
                 ScrollView:
@@ -492,15 +491,15 @@ ScreenManager:
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
             size_hint_x: None
-            width: 270
+            width: dp(270)
             required: True
-            font_size: 16
+            font_size: dp(16)
             pos_hint: {"center_x": 0.5}
 
         GridLayout:
             cols:2
             size_hint_x: None
-            width: 350
+            width: dp(350)
             pos_hint: {"center_x": 0.5}
             MDLabel:
                 text: "Select task type:"
@@ -508,7 +507,7 @@ ScreenManager:
             GridLayout:
                 cols: 2
                 size_hint_x: None
-                width: 200
+                width: dp(200)
                 pos_hint: {"center_x": 0.5}
                 MDCheckbox:
                     id: exam
@@ -531,11 +530,11 @@ ScreenManager:
         GridLayout:
             cols: 2
             size_hint_y: None
-            height: 50
+            height: dp(50)
             size_hint_x: None
-            width: 400
+            width: dp(400)
             pos_hint: {"center_x": 0.5}
-            padding: [10,10]
+            padding: [dp(10),dp(10)]
             MDLabel:
                 text: "Select Subject"
                 halign: "center"
@@ -548,17 +547,17 @@ ScreenManager:
                 line_color_focus: app.theme_cls.accent_color
                 pos_hint: {"center_x": 0.5}
                 size_hint_x: None
-                width: 190
+                width: dp(190)
                 on_focus: if self.focus: app.drop_subs()
 
         GridLayout:
             cols: 2
             size_hint_y: None
-            height: 50
+            height: dp(50)
             size_hint_x: None
-            width: 400
+            width: dp(400)
             pos_hint: {"center_x": 0.5}
-            padding: [10,20]
+            padding: [dp(10),dp(20)]
             MDLabel:
                 text: "Marks percentage:"
                 halign: "center"
@@ -576,9 +575,9 @@ ScreenManager:
         GridLayout:
             cols: 2
             size_hint: None, None
-            width: 210
+            width: dp(210)
             pos_hint: {"center_x": 0.5}
-            padding: [10,50]
+            padding: [dp(10),50]
             MDTextField:
                 id: due_date
                 text: ""
@@ -590,7 +589,7 @@ ScreenManager:
                 line_color_focus: app.theme_cls.accent_color
                 pos_hint: {"center_x": 0.5}
                 size_hint_x: None
-                width: 190
+                width: dp(190)
 
             MDIconButton:
                 icon: "calendar-month"
@@ -602,10 +601,10 @@ ScreenManager:
         GridLayout:
             cols: 2
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
-            padding: [0, 20]
-            spacing: [30, 0]
+            padding: [0, dp(20)]
+            spacing: [dp(30), 0]
             MDFlatButton:
                 text: "Cancel"
                 on_release: root.manager.current = "Home"
@@ -645,7 +644,7 @@ ScreenManager:
             width: 210
             pos_hint: {"center_x": 0.5}
 
-            padding: [0, 15]
+            padding: [0, dp(15)]
             MDTextField:
                 id: eve_date
                 text: ""
@@ -668,9 +667,9 @@ ScreenManager:
         GridLayout:
             cols: 2
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
-            spacing: [30, 0]
+            spacing: [dp(30), 0]
             MDTextField:
                 id: eve_time_start
                 text: ""
@@ -695,9 +694,9 @@ ScreenManager:
         GridLayout:
             cols: 2
             size_hint_x: None
-            width: 250
+            width: dp(250)
             pos_hint: {"center_x": 0.5}
-            spacing: [30, 0]
+            spacing: [dp(30), 0]
             MDFlatButton:
                 text: "Cancel"
                 on_release:
@@ -727,7 +726,7 @@ ScreenManager:
 
                     GridLayout:
                         size_hint_y: None
-                        height: 100
+                        height: dp(100)
                         cols: 7
                         pos_hint : {'center_y': .7}
                         MDLabel:
@@ -773,7 +772,7 @@ ScreenManager:
 <ContentCustomSheet>:
     orientation: "vertical"
     size_hint_y: None
-    height: 250
+    height: dp(250)
     bottom_date: bottom_date
     prev_b: prev_b
     next_b:next_b
@@ -794,9 +793,8 @@ ScreenManager:
             on_release: root.change_date_next()
     GridLayout:
         cols: 4
-        spacing: 20
-        spacing: 20
-        padding: 30
+        spacing: dp(20)
+        padding: dp(30)
         Button:
             id: Jan
             text: "Jan"
@@ -861,7 +859,7 @@ ScreenManager:
                     left_action_items: [['close', lambda x : app.close_page2()]]
                 MDLabel:
                     text: "Events for the day"
-                    font_size: 25
+                    font_size: dp(25)
                     theme_text_color: "Custom"
                     text_color: 1,99/255,71/255, 1
                     halign: 'center'
@@ -885,7 +883,7 @@ ScreenManager:
             Screen:
                 BoxLayout:
                     orientation: 'vertical'
-                    spacing: 20
+                    spacing: dp(20)
 
                     MDToolbar:
                         title: 'Profile Settings'
@@ -908,7 +906,7 @@ ScreenManager:
                                     text: 'Change UserName'
                                     size_hint_y: None
                                     font_style: "H6"
-                                    font_size: '15'
+                                    font_size: dp(15)
                                     height: dp(36)
                                 MDIconButton:
                                     icon: 'pencil'
@@ -933,7 +931,7 @@ ScreenManager:
                                     text: 'Change Email'
                                     size_hint_y: None
                                     font_style: "H6"
-                                    font_size: '15'
+                                    font_size: dp(15)
                                     height: dp(36)
                                 MDIconButton:
                                     icon: 'pencil'
@@ -956,7 +954,7 @@ ScreenManager:
                                     text: 'Change Password'
                                     size_hint_y: None
                                     font_style: "H6"
-                                    font_size: '15'
+                                    font_size: dp(15)
                                     height: dp(36)
                                 MDIconButton:
                                     icon: 'pencil'
@@ -988,19 +986,19 @@ ScreenManager:
                         text: "Enter your estimated grades!!"
                         halign: 'center'
                         size_hint_y: None
-                        height: 100
+                        height: dp(100)
                     GridLayout:
                         id: grid_cgpa
                         cols: 3
                         size_hint: None, None
-                        width: 400
+                        width: dp(400)
                         pos_hint: {"center_x": 0.5}
-                        padding: [30, 0]
-                        spacing: [20, 0]
+                        padding: [dp(30), 0]
+                        spacing: [dp(20), 0]
                         MDTextField:
                             size_hint_x: None
-                            width: 150
-                            font_size: 15
+                            width: dp(150)
+                            font_size: dp(15)
                             hint_text: 'Subject'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1009,8 +1007,8 @@ ScreenManager:
                         MDTextField:
                             id: cre_1
                             size_hint_x: None
-                            width: 100
-                            font_size: 15
+                            width: dp(100)
+                            font_size: dp(15)
                             hint_text: 'Credit Hours'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1019,8 +1017,8 @@ ScreenManager:
                         MDTextField:
                             id: gra_1
                             size_hint_x: None
-                            width: 75
-                            font_size: 15
+                            width: dp(75)
+                            font_size: dp(15)
                             hint_text: 'Grade'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1029,8 +1027,8 @@ ScreenManager:
                             on_focus: if self.focus: app.drop_gra(self)
                         MDTextField:
                             size_hint_x: None
-                            width: 150
-                            font_size: 15
+                            width: dp(150)
+                            font_size: dp(15)
                             hint_text: 'Subject'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1039,8 +1037,8 @@ ScreenManager:
                         MDTextField:
                             id: cre_2
                             size_hint_x: None
-                            width: 100
-                            font_size: 15
+                            width: dp(100)
+                            font_size: dp(15)
                             hint_text: 'Credit Hours'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1049,8 +1047,8 @@ ScreenManager:
                         MDTextField:
                             id: gra_2
                             size_hint_x: None
-                            width: 75
-                            font_size: 15
+                            width: dp(75)
+                            font_size: dp(15)
                             hint_text: 'Grade'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1059,8 +1057,8 @@ ScreenManager:
                             on_focus: if self.focus: app.drop_gra(self)
                         MDTextField:
                             size_hint_x: None
-                            width: 150
-                            font_size: 15
+                            width: dp(150)
+                            font_size: dp(15)
                             hint_text: 'Subject'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1069,8 +1067,8 @@ ScreenManager:
                         MDTextField:
                             id: cre_3
                             size_hint_x: None
-                            width: 100
-                            font_size: 15
+                            width: dp(100)
+                            font_size: dp(15)
                             hint_text: 'Credit Hours'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1079,8 +1077,8 @@ ScreenManager:
                         MDTextField:
                             id: gra_3
                             size_hint_x: None
-                            width: 75
-                            font_size: 15
+                            width: dp(75)
+                            font_size: dp(15)
                             hint_text: 'Grade'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1089,8 +1087,8 @@ ScreenManager:
                             on_focus: if self.focus: app.drop_gra(self)
                         MDTextField:
                             size_hint_x: None
-                            width: 150
-                            font_size: 15
+                            width: dp(150)
+                            font_size: dp(15)
                             hint_text: 'Subject'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1099,8 +1097,8 @@ ScreenManager:
                         MDTextField:
                             id: cre_4
                             size_hint_x: None
-                            width: 100
-                            font_size: 15
+                            width: dp(100)
+                            font_size: dp(15)
                             hint_text: 'Credit Hours'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1109,8 +1107,8 @@ ScreenManager:
                         MDTextField:
                             id: gra_4
                             size_hint_x: None
-                            width: 75
-                            font_size: 15
+                            width: dp(75)
+                            font_size: dp(15)
                             hint_text: 'Grade'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1119,8 +1117,8 @@ ScreenManager:
                             on_focus: if self.focus: app.drop_gra(self)
                         MDTextField:
                             size_hint_x: None
-                            width: 150
-                            font_size: 15
+                            width: dp(150)
+                            font_size: dp(15)
                             hint_text: 'Subject'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1129,8 +1127,8 @@ ScreenManager:
                         MDTextField:
                             id: cre_5
                             size_hint_x: None
-                            width: 100
-                            font_size: 15
+                            width: dp(100)
+                            font_size: dp(15)
                             hint_text: 'Credit Hours'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1139,8 +1137,8 @@ ScreenManager:
                         MDTextField:
                             id: gra_5
                             size_hint_x: None
-                            width: 75
-                            font_size: 15
+                            width: dp(75)
+                            font_size: dp(15)
                             hint_text: 'Grade'
                             pos_hint: {"center_x": 0.5}
                             color_mode: 'custom'
@@ -1180,7 +1178,7 @@ ScreenManager:
                         left_action_items: [['close', lambda x : app.close_page()]]
                     MDLabel:
                         text: "Details of the Task"
-                        font_size: 25
+                        font_size: dp(25)
                         theme_text_color: "Custom"
                         text_color: 1,99/255,71/255, 1
                         halign: 'center'
@@ -1213,9 +1211,9 @@ ScreenManager:
                     GridLayout:
                         cols: 2
                         size_hint_x: None
-                        width: 250
+                        width: dp(250)
                         pos_hint: {"center_x": 0.5}
-                        spacing: [30, 0]
+                        spacing: [dp(30), dp(0)]
                         MDRectangleFlatButton:
                             text: "Done for the day"
                             on_release:
