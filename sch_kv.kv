@@ -1217,6 +1217,12 @@ ScreenManager:
                         pos_hint: {"center_x": 0.5}
                         spacing: [30, 0]
                         MDRectangleFlatButton:
+                            text: "Done for the day"
+                            on_release:
+                                app.delete_task(self)
+                                root.manager.transition = NoTransition()
+                                root.manager.current = "Home"
+                        MDRectangleFlatButton:
                             text: "Completed"
                             on_release:
                                 app.delete_task(self)

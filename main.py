@@ -20,9 +20,7 @@ import datetime
 import re
 
 from pages import *
-from kivy.core.window import Window
 
-Window.size = (400, 650)
 
 db = sql.connect('D:\Documents\MIU\SPSDScheduler_FYP\scheduler.db')
 cur = db.cursor()
@@ -351,11 +349,15 @@ class Scheduler(MDApp):
         self.task_ids = cur.fetchall()
         self.task_id = str(self.task_ids[0][0])
         delete_query = "Delete from task_time_allocation where task_id = " + self.task_id + ""
-        cur.execute(delete_query)
-        db.commit()
         delete_query2 = "Delete from students_task where task_id = " + self.task_id + ""
-        cur.execute(delete_query2)
-        db.commit()
+        if instance.text == "Completed":
+            cur.execute(delete_query)
+            db.commit()
+            cur.execute(delete_query2)
+            db.commit()
+        else:
+            cur.execute(delete_query2)
+            db.commit()
         self.allot_time()
         self.home_view()
 
