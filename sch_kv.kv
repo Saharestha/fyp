@@ -16,7 +16,15 @@ ScreenManager:
 
 <LoginPage>
     name: "LoginPage"
+    canvas:
+        Color:
+            rgba: app.theme_cls.bg_darkest
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
     MDBoxLayout:
+
         size_hint: None, None
         size: dp(400), dp(500)
         pos_hint:{"center_x": 0.5, "center_y": 0.5}
@@ -25,6 +33,11 @@ ScreenManager:
 
         Image:
             source: "Logo.jpeg"
+            pos_hint:{"center_x": 0.5, "center_y": 0.5}
+            size_hint: None, None
+            size: dp(300), dp(200)
+
+
 
         MDLabel:
             id: error_text
@@ -286,6 +299,7 @@ ScreenManager:
         BoxLayout:
             size_hint_y: None
             height: dp(100)
+            spacing: [dp(30), dp(0)]
             MDFlatButton:
                 text: "Go Back"
                 text_color: self.theme_cls.primary_color
@@ -349,8 +363,6 @@ ScreenManager:
     MDTextField:
         id: course_code
         hint_text: "Course Code"
-        helper_text: "Required"
-        helper_text_mode: 'on_error'
         color_mode:'custom'
         current_hint_text_color: app.theme_cls.accent_color
         line_color_focus: app.theme_cls.accent_color
@@ -359,8 +371,6 @@ ScreenManager:
     MDTextField:
         id: course_name
         hint_text: "Course Name"
-        helper_text: "Required"
-        helper_text_mode: 'on_error'
         color_mode:'custom'
         current_hint_text_color: app.theme_cls.accent_color
         line_color_focus: app.theme_cls.accent_color
@@ -369,8 +379,6 @@ ScreenManager:
     MDTextField:
         id: course_credit
         hint_text: "Credit_hours"
-        helper_text: "Required"
-        helper_text_mode: 'on_error'
         color_mode:'custom'
         current_hint_text_color: app.theme_cls.accent_color
         line_color_focus: app.theme_cls.accent_color
@@ -485,8 +493,6 @@ ScreenManager:
         MDTextField:
             id: task_name
             hint_text: "Task Name"
-            helper_text: "Required"
-            helper_text_mode: 'on_error'
             color_mode:'custom'
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color
@@ -627,8 +633,6 @@ ScreenManager:
         MDTextField:
             id: event_name
             hint_text: "Event Name"
-            helper_text: "Required"
-            helper_text_mode: 'on_error'
             color_mode:'custom'
             current_hint_text_color: app.theme_cls.accent_color
             line_color_focus: app.theme_cls.accent_color

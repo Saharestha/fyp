@@ -12,17 +12,18 @@ from kivy.factory import Factory
 from kivymd.uix.dialog import MDDialog
 from kivy.properties import ObjectProperty
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
+from kivy.config import Config
 import os
 import sqlite3 as sql
 import calendar
 from datetime import timedelta
 import datetime
 import re
-
 from pages import *
 
+Config.set('graphics', 'resizeable', True)
 
-db = sql.connect('D:\Documents\MIU\SPSDScheduler_FYP\scheduler.db')
+db = sql.connect('scheduler.db')
 cur = db.cursor()
 
 months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July',
@@ -546,6 +547,12 @@ class Scheduler(MDApp):
             db.commit()
             self.set_priority()
             self.home_view()
+            self.strng.get_screen('TaskScreen').ids.task_name.text = ""
+            self.strng.get_screen('TaskScreen').ids.exam.state = "up"
+            self.strng.get_screen('TaskScreen').ids.assign.state = "up"
+            self.strng.get_screen('TaskScreen').ids.due_date.text = ""
+            self.strng.get_screen('TaskScreen').ids.percent.text = ""
+            self.strng.get_screen('TaskScreen').ids.task_sub.text = ""
             self.strng.get_screen('Home').manager.current = 'Home'
 
         else:
@@ -568,6 +575,10 @@ class Scheduler(MDApp):
             cur.execute(self.insert_event)
             db.commit()
             self.home_view()
+            self.strng.get_screen('EventScreen').ids.event_name.text = ""
+            self.strng.get_screen('EventScreen').ids.eve_date.text = ""
+            self.strng.get_screen('EventScreen').ids.eve_time_start.text = ""
+            self.strng.get_screen('EventScreen').ids.eve_time_end.text = ""
             self.strng.get_screen('Home').manager.current = 'Home'
 
         else:
